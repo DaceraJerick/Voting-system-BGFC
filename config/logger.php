@@ -68,8 +68,7 @@ class SystemLogger {
         $log_entry .= "\n";
         
         file_put_contents($this->log_dir . $this->log_files['database'], $log_entry, FILE_APPEND);
-    }
-    
+    }xa
     /**
      * Log voting activities
      * @param string $action

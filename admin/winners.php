@@ -17,14 +17,23 @@ $all_elections = $pdo->query("
     ORDER BY created_at DESC
 ")->fetchAll();
 
+$upcoming_elections = [];
 $active_elections = [];
 $ended_elections = [];
 
 foreach($all_elections as $el) {
-    if(strtotime($el['end_date']) < time()) {
-        $ended_elections[] = $el;
-    } else {
+    $now = time();
+    $start = strtotime($el['start_date']);
+    $end   = strtotime($el['end_date']);
+    if($now < $start) {
+        // Not started yet
+        $upcoming_elections[] = $el;
+    } elseif($now >= $start && $now <= $end) {
+        // Currently running
         $active_elections[] = $el;
+    } else {
+        // Past end date
+        $ended_elections[] = $el;
     }
 }
 
@@ -38,7 +47,11 @@ if(isset($_GET['election_id'])) {
     $stmt->execute([$election_id]);
     $selected_election = $stmt->fetch();
 
-    if($selected_election) {
+    // Only calculate winners if the election has actually ended
+    $election_has_ended = $selected_election && strtotime($selected_election['end_date']) < time();
+    $election_not_started = $selected_election && strtotime($selected_election['start_date']) > time();
+
+    if($selected_election && $election_has_ended) {
         $election_results = [];
         
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM students");
@@ -95,20 +108,28 @@ if(isset($_GET['election_id'])) {
         foreach($election_results as $position_name => $position) {
             $max_votes = 0;
             $winners = [];
+            $second_highest = 0;
             
-            foreach($position['candidates'] as $candidate) {
-                if($candidate['vote_count'] > $max_votes) {
-                    $max_votes = $candidate['vote_count'];
-                    $winners = [$candidate];
-                } elseif($candidate['vote_count'] == $max_votes && $max_votes > 0) {
-                    $winners[] = $candidate;
+            if(count($position['candidates']) > 0) {
+                $max_votes = $position['candidates'][0]['vote_count'];
+                foreach($position['candidates'] as $candidate) {
+                    if($candidate['vote_count'] == $max_votes && $max_votes > 0) {
+                        $winners[] = $candidate;
+                    } elseif ($candidate['vote_count'] < $max_votes) {
+                        if ($second_highest == 0) {
+                            $second_highest = $candidate['vote_count'];
+                        }
+                    }
                 }
             }
+            
+            $margin = count($winners) > 1 ? 0 : ($max_votes - $second_highest);
             
             $winners_only[$position_name] = [
                 'winners' => $winners,
                 'total_votes' => $position['total_votes'],
                 'max_votes' => $max_votes,
+                'margin' => $margin,
                 'is_tie' => count($winners) > 1
             ];
         }
@@ -540,6 +561,29 @@ include '../includes/header.php';
         text-align: center;
     }
 }
+
+/* =========================================
+   DARK MODE OVERRIDES
+   ========================================= */
+[data-theme="dark"] .election-selector { background: rgba(20,22,35,0.85); border-color: rgba(99,102,241,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+[data-theme="dark"] .selector-title { color: #e2e8f0; }
+[data-theme="dark"] .election-card { background: rgba(30,32,48,0.8); border-color: transparent; }
+[data-theme="dark"] .election-card:hover { box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
+[data-theme="dark"] .election-title { color: #e2e8f0; }
+[data-theme="dark"] .election-card.selected { border-color: #3498db; background: rgba(52,152,219,0.1); }
+[data-theme="dark"] .winners-showcase { background: rgba(20,22,35,0.85); box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
+[data-theme="dark"] .election-info-bar { background: rgba(30,32,48,0.8); }
+[data-theme="dark"] .meta-item { background: rgba(20,22,35,0.9); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.05); }
+[data-theme="dark"] .position-winner-section { background: rgba(30,32,48,0.8); border-color: rgba(99,102,241,0.15); }
+[data-theme="dark"] .position-header { border-bottom-color: rgba(255,255,255,0.1); }
+[data-theme="dark"] .position-name { color: #e2e8f0; }
+[data-theme="dark"] .winner-name { color: #e2e8f0; }
+[data-theme="dark"] .winner-id { background: rgba(20,22,35,0.9); color: #94a3b8; }
+[data-theme="dark"] .stat-box { background: rgba(20,22,35,0.9); }
+[data-theme="dark"] .stat-box .label { color: #94a3b8; }
+[data-theme="dark"] .tie-candidate { background: rgba(20,22,35,0.9); border-color: rgba(255,255,255,0.05); }
+[data-theme="dark"] .no-results { background: rgba(30,32,48,0.8); color: #94a3b8; }
+[data-theme="dark"] .no-results i { color: #475569; }
 </style>
 
 <div class="winners-container">
@@ -570,6 +614,30 @@ include '../includes/header.php';
             <i class="bi bi-calendar3"></i>
             Select an Election
         </div>
+
+        <!-- Upcoming Elections (not started yet) -->
+        <?php if(count($upcoming_elections) > 0): ?>
+            <div class="mb-4">
+                <h6 class="fw-bold mb-3" style="color: #6366f1;">
+                    <i class="bi bi-calendar-plus-fill"></i> Upcoming Elections
+                </h6>
+                <div class="election-grid">
+                    <?php foreach($upcoming_elections as $election): ?>
+                        <div class="election-card" style="border-left: 5px solid #6366f1; cursor: default; opacity: 0.7;">
+                            <span class="election-badge" style="background:#6366f1; color:white;">UPCOMING</span>
+                            <div class="election-title"><?php echo htmlspecialchars($election['title']); ?></div>
+                            <div class="election-date">
+                                <i class="bi bi-calendar-event"></i>
+                                Starts: <?php echo date('M d, Y h:i A', strtotime($election['start_date'])); ?>
+                            </div>
+                            <div class="text-muted small">
+                                <i class="bi bi-clock"></i> Not started yet
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <!-- Active Elections (if any) -->
         <?php if(count($active_elections) > 0): ?>
@@ -629,6 +697,22 @@ include '../includes/header.php';
     <!-- Winners Display -->
     <?php if($selected_election): ?>
         <div class="winners-showcase">
+
+        <?php if($election_not_started): ?>
+            <!-- Election hasn't started yet -->
+            <div class="no-results">
+                <i class="bi bi-clock" style="font-size: 80px; color: #6366f1; opacity: 0.5;"></i>
+                <h4 class="mt-4 fw-bold">Election Has Not Started Yet</h4>
+                <p class="text-muted">Winners will be available once the election ends on <strong><?php echo date('F d, Y h:i A', strtotime($selected_election['end_date'])); ?></strong>.</p>
+            </div>
+        <?php elseif(!$election_has_ended): ?>
+            <!-- Election is currently active -->
+            <div class="no-results">
+                <i class="bi bi-hourglass-split" style="font-size: 80px; color: #f39c12; opacity: 0.6;"></i>
+                <h4 class="mt-4 fw-bold">Election Is Currently In Progress</h4>
+                <p class="text-muted">Winners will be declared after the election ends on <strong><?php echo date('F d, Y h:i A', strtotime($selected_election['end_date'])); ?></strong>.</p>
+            </div>
+        <?php else: ?>
             <!-- Election Info Bar -->
             <div class="election-info-bar">
                 <div>
@@ -723,7 +807,8 @@ include '../includes/header.php';
                             </div>
                         <?php else: ?>
                             <!-- Single Winner -->
-                            <?php $winner = $data['winners'][0]; ?>
+                            <?php $winner = !empty($data['winners']) ? $data['winners'][0] : null; ?>
+                            <?php if($winner): ?>
                             <div class="winner-profile">
                                 <?php if(!empty($winner['photo']) && file_exists('../' . $winner['photo'])): ?>
                                     <img src="../<?php echo $winner['photo']; ?>" 
@@ -737,30 +822,36 @@ include '../includes/header.php';
                                 
                                 <div class="winner-info">
                                     <div class="winner-name">
-                                        <?php echo htmlspecialchars($candidate['candidate_name'] ?? ''); ?>
+                                        <?php echo htmlspecialchars($winner['candidate_name'] ?? ''); ?>
                                     </div>
                                     <div class="winner-id">
                                         <i class="bi bi-person-badge"></i>
-                                        <?php echo htmlspecialchars($winner['student_id']); ?>
+                                        <?php echo htmlspecialchars($winner['student_id'] ?? ''); ?>
                                     </div>
                                     
                                     <div class="winner-stats-grid">
                                         <div class="stat-box">
-                                            <div class="number"><?php echo $winner['vote_count']; ?></div>
+                                            <div class="number"><?php echo $winner['vote_count'] ?? 0; ?></div>
                                             <div class="label">Votes Received</div>
                                         </div>
                                         <div class="stat-box">
-                                            <?php $percentage = $data['total_votes'] > 0 ? round(($winner['vote_count'] / $data['total_votes']) * 100, 1) : 0; ?>
+                                            <?php $percentage = $data['total_votes'] > 0 ? round((($winner['vote_count'] ?? 0) / $data['total_votes']) * 100, 1) : 0; ?>
                                             <div class="number"><?php echo $percentage; ?>%</div>
                                             <div class="label">Vote Share</div>
                                         </div>
                                         <div class="stat-box">
-                                            <div class="number"><?php echo $data['max_votes']; ?></div>
+                                            <div class="number"><?php echo $data['margin']; ?></div>
                                             <div class="label">Margin</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <?php else: ?>
+                            <div class="no-results">
+                                <i class="bi bi-person-x"></i>
+                                <p class="mt-3 text-muted">No votes were cast for this position.</p>
+                            </div>
+                            <?php endif; ?>
                         <?php endif; ?>
 
                         <!-- Position Summary -->
@@ -797,6 +888,7 @@ include '../includes/header.php';
                     </a>
                 </div>
             <?php endif; ?>
+        <?php endif; // end else (election has ended) ?>
         </div>
     <?php endif; ?>
 </div>

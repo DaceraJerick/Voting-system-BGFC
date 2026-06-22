@@ -35,12 +35,12 @@ include 'includes/header.php';
 
 /* ── glass helper ── */
 .glass {
-    background: rgba(255,255,255,0.55);
+    background: rgba(15,17,23,0.75);
     backdrop-filter: blur(20px) saturate(160%);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.82);
+    border: 1px solid rgba(99,102,241,0.16);
     border-radius: 24px;
-    box-shadow: 0 4px 24px rgba(100,120,200,0.08), 0 1px 3px rgba(0,0,0,0.04);
+    box-shadow: 0 12px 34px rgba(0,0,0,0.35);
 }
 
 /* ── HERO ── */
@@ -48,12 +48,12 @@ include 'includes/header.php';
     margin-bottom: 3rem;
     padding: 3.5rem 2.5rem;
     position: relative; overflow: hidden;
-    background: rgba(255,255,255,0.45);
+    background: rgba(10,14,24,0.95);
     backdrop-filter: blur(24px) saturate(170%);
     -webkit-backdrop-filter: blur(24px) saturate(170%);
-    border: 1px solid rgba(255,255,255,0.85);
+    border: 1px solid rgba(99,102,241,0.18);
     border-radius: 28px;
-    box-shadow: 0 8px 40px rgba(100,120,200,0.1);
+    box-shadow: 0 18px 60px rgba(0,0,0,0.35);
 }
 
 /* decorative orbs inside hero */
@@ -80,9 +80,9 @@ include 'includes/header.php';
 
 .hero-eyebrow {
     display: inline-flex; align-items: center; gap: 0.5rem;
-    background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.22);
+    background: rgba(99,102,241,0.14); border: 1px solid rgba(99,102,241,0.28);
     border-radius: 99px; padding: 0.3rem 1rem;
-    font-size: 0.8rem; font-weight: 700; color: #6366f1;
+    font-size: 0.8rem; font-weight: 700; color: #c7d2fe;
     letter-spacing: .04em; text-transform: uppercase;
     margin-bottom: 1.25rem;
 }
@@ -90,14 +90,14 @@ include 'includes/header.php';
 
 .hero-title {
     font-size: clamp(2rem, 4vw, 3.2rem);
-    font-weight: 800; color: #0f172a;
+    font-weight: 800; color: #f8fafc;
     letter-spacing: -0.035em; line-height: 1.15;
     margin-bottom: 1rem;
 }
-.hero-title em { font-style: normal; color: #6366f1; }
+.hero-title em { font-style: normal; color: #60a5fa; }
 
 .hero-sub {
-    font-size: 1.05rem; color: #475569; line-height: 1.7;
+    font-size: 1.05rem; color: #cbd5e1; line-height: 1.7;
     max-width: 560px; margin-bottom: 2rem;
 }
 
@@ -105,12 +105,12 @@ include 'includes/header.php';
 .hero-stats { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .h-stat {
     display: flex; align-items: center; gap: 0.65rem;
-    background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.95);
+    background: rgba(15,17,23,0.85); border: 1px solid rgba(99,102,241,0.14);
     border-radius: 14px; padding: 0.75rem 1.1rem;
     backdrop-filter: blur(10px);
     transition: transform .2s ease, box-shadow .2s ease;
 }
-.h-stat:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.1); }
+.h-stat:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.18); }
 .h-stat-icon {
     width: 36px; height: 36px; border-radius: 10px;
     display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;
@@ -118,19 +118,19 @@ include 'includes/header.php';
 .h-stat-icon.c1 { background: rgba(99,102,241,0.12); }
 .h-stat-icon.c2 { background: rgba(52,211,153,0.15); }
 .h-stat-icon.c3 { background: rgba(251,146,60,0.12); }
-.h-stat-num  { font-size: 1.3rem; font-weight: 800; color: #0f172a; line-height: 1; }
-.h-stat-lbl  { font-size: 0.72rem; color: #64748b; font-weight: 500; margin-top: 1px; }
+.h-stat-num  { font-size: 1.3rem; font-weight: 800; color: #f8fafc; line-height: 1; }
+.h-stat-lbl  { font-size: 0.72rem; color: #94a3b8; font-weight: 500; margin-top: 1px; }
 
 /* hero illustration */
 .hero-art {
     display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.9);
+    background: rgba(15,17,23,0.95); border: 1px solid rgba(99,102,241,0.2);
     border-radius: 24px; height: 100%; min-height: 240px;
-    backdrop-filter: blur(10px);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
 }
 .hero-icon-big {
     font-size: 7rem; line-height: 1;
-    background: linear-gradient(135deg, #6366f1, #a78bfa);
+    background: linear-gradient(135deg, #22c55e, #38bdf8);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     animation: floatIcon 4s ease-in-out infinite;
 }
@@ -139,14 +139,42 @@ include 'includes/header.php';
     50%      { transform: translateY(-12px); }
 }
 
+.hero-actions {
+    gap: 0.75rem;
+}
+.btn-theme {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    border-radius: 999px; padding: 0.75rem 1.25rem;
+    font-weight: 700; text-decoration: none; border: 1px solid transparent;
+    transition: all .2s ease;
+}
+.btn-theme-dark {
+    background: rgba(15,17,23,0.9);
+    color: #f8fafc;
+    border-color: rgba(99,102,241,0.3);
+}
+.btn-theme-dark:hover {
+    background: rgba(99,102,241,0.16);
+    color: #fff;
+}
+.btn-theme-light {
+    background: rgba(255,255,255,0.08);
+    color: #e2e8f0;
+    border-color: rgba(255,255,255,0.22);
+}
+.btn-theme-light:hover {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+}
+
 /* ── LIVE ALERT ── */
 .live-alert {
     padding: 1.25rem 1.5rem; margin-bottom: 2rem;
-    background: rgba(220,252,231,0.7);
-    border: 1px solid rgba(134,239,172,0.6);
+    background: rgba(15,23,42,0.92);
+    border: 1px solid rgba(34,197,94,0.22);
     border-radius: 20px;
     backdrop-filter: blur(14px);
-    box-shadow: 0 4px 16px rgba(34,197,94,0.08);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.3);
     animation: slideDown .4s ease;
 }
 @keyframes slideDown {
@@ -155,9 +183,9 @@ include 'includes/header.php';
 }
 .live-badge-pill {
     display: inline-flex; align-items: center; gap: 0.4rem;
-    background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3);
+    background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3);
     border-radius: 99px; padding: 0.25rem 0.8rem;
-    font-size: 0.75rem; font-weight: 700; color: #16a34a; letter-spacing:.04em;
+    font-size: 0.75rem; font-weight: 700; color: #bbf7d0; letter-spacing:.04em;
     text-transform: uppercase; flex-shrink: 0;
 }
 .live-dot { width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.2);animation:pulse 2s infinite; }
@@ -178,13 +206,13 @@ include 'includes/header.php';
 /* ── SECTION LABEL ── */
 .section-label {
     font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing:.08em; color: #6366f1; margin-bottom: 0.5rem;
+    letter-spacing:.08em; color: #818cf8; margin-bottom: 0.5rem;
 }
 .section-title {
     font-size: clamp(1.4rem,2.5vw,1.85rem); font-weight: 800;
-    color: #0f172a; letter-spacing:-0.025em; margin-bottom: 0.5rem;
+    color: #e2e8f0; letter-spacing:-0.025em; margin-bottom: 0.5rem;
 }
-.section-sub { font-size: 0.9rem; color: #64748b; margin-bottom: 2rem; }
+.section-sub { font-size: 0.9rem; color: #cbd5e1; margin-bottom: 2rem; }
 
 /* ── FEATURE CARDS ── */
 .feature-card {
@@ -202,21 +230,21 @@ include 'includes/header.php';
 .fc-icon.green   { background: rgba(52,211,153,0.15); }
 .fc-icon.indigo  { background: rgba(99,102,241,0.12); }
 .fc-icon.amber   { background: rgba(251,191,36,0.15); }
-.fc-title { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.6rem; }
-.fc-desc  { font-size: 0.875rem; color: #64748b; line-height: 1.7; flex: 1; margin-bottom: 1.25rem; }
+.fc-title { font-size: 1.1rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.6rem; }
+.fc-desc  { font-size: 0.875rem; color: #cbd5e1; line-height: 1.7; flex: 1; margin-bottom: 1.25rem; }
 
-.fc-divider { border-color: rgba(200,210,240,0.35); margin: 1rem 0; }
+.fc-divider { border-color: rgba(99,102,241,0.18); margin: 1rem 0; }
 
 .btn-glass {
     display: flex; align-items: center; justify-content: center; gap: 0.5rem;
     padding: 0.6rem 1rem; border-radius: 12px;
     font-size: 0.85rem; font-weight: 600;
     text-decoration: none; transition: all .2s ease;
-    border: 1px solid rgba(255,255,255,0.75);
-    background: rgba(255,255,255,0.6);
-    color: #334155 !important;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(255,255,255,0.08);
+    color: #e2e8f0 !important;
 }
-.btn-glass:hover { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.3); color: #6366f1 !important; text-decoration:none; }
+.btn-glass:hover { background: rgba(99,102,241,0.16); border-color: rgba(99,102,241,0.3); color: #fff !important; text-decoration:none; }
 .btn-glass.primary {
     background: linear-gradient(135deg,#6366f1,#818cf8);
     color: #fff !important; border-color: transparent;
@@ -239,18 +267,18 @@ include 'includes/header.php';
 /* countdown badge */
 .countdown-pill {
     display: inline-flex; align-items: center; gap: 0.45rem;
-    background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.3);
+    background: rgba(15,17,23,0.92); border: 1px solid rgba(251,191,36,0.25);
     border-radius: 99px; padding: 0.3rem 0.8rem;
-    font-size: 0.78rem; font-weight: 700; color: #92400e;
+    font-size: 0.78rem; font-weight: 700; color: #facc15;
 }
 .election-mini {
-    background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.9);
+    background: rgba(15,17,23,0.9); border: 1px solid rgba(99,102,241,0.18);
     border-radius: 14px; padding: 0.9rem 1rem; margin-bottom: 1rem;
 }
 .election-mini.live-border { border-left: 3px solid #22c55e; }
 .election-mini.upcoming-border { border-left: 3px solid #fbbf24; }
-.election-mini-title { font-size: 0.9rem; font-weight: 700; color: #1e293b; margin-bottom: 0.3rem; }
-.election-mini-date  { font-size: 0.75rem; color: #64748b; display:flex;align-items:center;gap:.35rem; }
+.election-mini-title { font-size: 0.9rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.3rem; }
+.election-mini-date  { font-size: 0.75rem; color: #94a3b8; display:flex;align-items:center;gap:.35rem; }
 
 /* ── STATS STRIP ── */
 .stats-strip {
@@ -277,10 +305,10 @@ include 'includes/header.php';
 .ss-card.c3 .ss-blob{background:#f472b6} .ss-card.c4 .ss-blob{background:#fb923c}
 .ss-icon { font-size: 1.5rem; margin-bottom: 0.75rem; display:block; }
 .ss-num {
-    font-size: 2rem; font-weight: 800; color: #0f172a;
+    font-size: 2rem; font-weight: 800; color: #f8fafc;
     letter-spacing: -0.03em; line-height: 1;
 }
-.ss-lbl { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing:.06em; margin-top:.4rem; }
+.ss-lbl { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing:.06em; margin-top:.4rem; }
 
 /* ── UPCOMING ELECTIONS ── */
 .upcoming-card {
@@ -295,13 +323,13 @@ include 'includes/header.php';
     font-size: 0.7rem; font-weight: 700; color: #92400e;
     letter-spacing:.04em; text-transform:uppercase; margin-bottom: 0.65rem;
 }
-.uc-title { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
-.uc-meta  { font-size: 0.8rem; color: #64748b; display:flex;align-items:center;gap:.35rem;margin-bottom:.25rem; }
+.uc-title { font-size: 0.95rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.5rem; }
+.uc-meta  { font-size: 0.8rem; color: #cbd5e1; display:flex;align-items:center;gap:.35rem;margin-bottom:.25rem; }
 .uc-countdown {
     display: inline-flex; align-items: center; gap: .35rem;
-    background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,.95);
+    background: rgba(15,17,23,0.9); border: 1px solid rgba(99,102,241,0.16);
     border-radius: 99px; padding: .22rem .7rem;
-    font-size: 0.75rem; font-weight: 600; color: #475569;
+    font-size: 0.75rem; font-weight: 600; color: #cbd5e1;
     margin-top: .5rem;
 }
 
@@ -309,21 +337,21 @@ include 'includes/header.php';
 .trust-strip { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 2rem 0; }
 .trust-item {
     display: flex; align-items: center; gap: 0.75rem;
-    background: rgba(255,255,255,0.65); border: 1px solid rgba(255,255,255,0.9);
+    background: rgba(15,17,23,0.92); border: 1px solid rgba(99,102,241,0.16);
     border-radius: 16px; padding: 0.85rem 1.2rem;
     backdrop-filter: blur(12px); flex: 1; min-width: 180px; max-width: 240px;
-    transition: transform .2s ease;
+    transition: transform .2s ease, box-shadow .2s ease;
 }
-.trust-item:hover { transform: translateY(-2px); }
+.trust-item:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,0.22); }
 .trust-icon { font-size: 1.4rem; flex-shrink: 0; }
-.trust-title { font-size: 0.875rem; font-weight: 700; color: #1e293b; }
+.trust-title { font-size: 0.875rem; font-weight: 700; color: #e2e8f0; }
 .trust-sub   { font-size: 0.75rem; color: #94a3b8; margin-top: 1px; }
 
 /* ── CTA BANNER ── */
 .cta-banner {
     padding: 2.5rem 2rem; margin-top: 3rem;
-    background: rgba(99,102,241,0.07);
-    border: 1px solid rgba(99,102,241,0.15);
+    background: rgba(15,17,23,0.9);
+    border: 1px solid rgba(99,102,241,0.18);
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 1.5rem;
     border-radius: 24px;
@@ -333,8 +361,8 @@ include 'includes/header.php';
     content:''; position:absolute; inset:0; pointer-events:none;
     background: linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(167,139,250,0.06) 100%);
 }
-.cta-banner h2 { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin: 0; letter-spacing:-.025em; }
-.cta-banner p  { font-size: 0.9rem; color: #64748b; margin: 0.35rem 0 0; }
+.cta-banner h2 { font-size: 1.5rem; font-weight: 800; color: #e2e8f0; margin: 0; letter-spacing:-.025em; }
+.cta-banner p  { font-size: 0.9rem; color: #94a3b8; margin: 0.35rem 0 0; }
 .btn-cta {
     display: inline-flex; align-items: center; gap: 0.5rem;
     background: linear-gradient(135deg, #6366f1, #818cf8);
@@ -362,6 +390,34 @@ include 'includes/header.php';
     from { opacity:0; transform:translateY(16px) scale(.96); }
     to   { opacity:1; transform:translateY(0) scale(1); }
 }
+
+/* Light Theme Overrides */
+[data-theme="light"] .glass { background: rgba(255, 255, 255, 0.85); border-color: rgba(99, 102, 241, 0.2); box-shadow: 0 12px 34px rgba(0,0,0,0.08); }
+[data-theme="light"] .hero { background: rgba(255, 255, 255, 0.9); border-color: rgba(99, 102, 241, 0.2); box-shadow: 0 18px 60px rgba(0,0,0,0.08); }
+[data-theme="light"] .hero-title, [data-theme="light"] .section-title, [data-theme="light"] .fc-title, [data-theme="light"] .cta-banner h2, [data-theme="light"] .ss-num, [data-theme="light"] .uc-title, [data-theme="light"] .trust-title { color: #1e293b; }
+[data-theme="light"] .hero-sub, [data-theme="light"] .section-sub, [data-theme="light"] .fc-desc, [data-theme="light"] .cta-banner p, [data-theme="light"] .uc-meta, [data-theme="light"] .ss-lbl, [data-theme="light"] .trust-sub { color: #475569; }
+[data-theme="light"] .h-stat, [data-theme="light"] .ss-card, [data-theme="light"] .upcoming-card, [data-theme="light"] .trust-item, [data-theme="light"] .cta-banner { background: rgba(255, 255, 255, 0.95); border-color: rgba(99, 102, 241, 0.15); }
+[data-theme="light"] .h-stat-num { color: #1e293b; }
+[data-theme="light"] .h-stat-lbl { color: #64748b; }
+[data-theme="light"] .hero-art { background: rgba(248, 250, 252, 0.95); box-shadow: 0 24px 60px rgba(0,0,0,0.08); }
+[data-theme="light"] .btn-theme-dark { background: #1e293b; color: #f8fafc; }
+[data-theme="light"] .btn-theme-light { background: #e2e8f0; color: #1e293b; border-color: #cbd5e1; }
+[data-theme="light"] .live-alert { background: rgba(255, 255, 255, 0.95); border-color: rgba(34, 197, 94, 0.3); }
+[data-theme="light"] .btn-glass { color: #1e293b !important; background: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.2); }
+[data-theme="light"] .btn-glass:hover { background: rgba(99, 102, 241, 0.15); }
+[data-theme="light"] .btn-glass.primary { background: linear-gradient(135deg,#6366f1,#818cf8); color: #fff !important; border-color: transparent; }
+[data-theme="light"] .btn-glass.green-fill { background: linear-gradient(135deg,#22c55e,#16a34a); color: #fff !important; border-color: transparent; }
+[data-theme="light"] .btn-glass.primary:hover, [data-theme="light"] .btn-glass.green-fill:hover { opacity: 0.9; }
+[data-theme="light"] .election-mini { background: rgba(248, 250, 252, 0.95); border-color: rgba(99, 102, 241, 0.2); }
+[data-theme="light"] .election-mini-title { color: #1e293b; }
+[data-theme="light"] .election-mini-date { color: #64748b; }
+[data-theme="light"] .countdown-pill { background: rgba(241, 245, 249, 0.9); }
+[data-theme="light"] .uc-countdown { background: rgba(241, 245, 249, 0.9); color: #475569; border-color: rgba(99, 102, 241, 0.2); }
+
+.hero-logo-container { background: #000; }
+[data-theme="light"] .hero-logo-container { background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,0.1), 0 0 0 6px rgba(0,0,0,0.05) !important; }
+[data-theme="light"] .logo-dark { display: none !important; }
+[data-theme="light"] .logo-light { display: block !important; }
 </style>
 
 <div class="page-wrap">
@@ -401,12 +457,22 @@ include 'includes/header.php';
                         </div>
                     </div>
                 </div>
+                <div class="hero-actions mt-4 d-flex flex-wrap gap-2 align-items-center">
+                    <a href="student/login.php" class="btn-glass green-fill">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                    <button class="btn-theme btn-theme-dark" onclick="applyTheme('dark'); return false;">
+                        <i class="bi bi-moon-fill"></i> Dark
+                    </button>
+                    <button class="btn-theme btn-theme-light" onclick="applyTheme('light'); return false;">
+                        <i class="bi bi-sun-fill"></i> Light
+                    </button>
+                </div>
             </div>
-            <div class="col-lg-5 d-none d-lg-flex">
-                <div class="hero-art w-100">
-                    <div class="hero-icon-big">
-                        <i class="bi bi-check2-square"></i>
-                    </div>
+            <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-center">
+                <div class="hero-logo-container" style="width: 280px; height: 280px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 6px rgba(255,255,255,0.15); animation: floatIcon 4s ease-in-out infinite;">
+                    <img src="assets/img/logo.png" alt="School Logo Dark" class="img-fluid logo-dark" style="width: 90%; height: 90%; object-fit: contain;">
+                    <img src="assets/img/image.png" alt="School Logo Light" class="img-fluid logo-light" style="width: 90%; height: 90%; object-fit: contain; display: none;">
                 </div>
             </div>
         </div>
@@ -440,7 +506,7 @@ include 'includes/header.php';
     <div class="row g-3 mb-5" id="features">
 
         <!-- Students -->
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="feature-card glass" style="animation-delay:.05s">
                 <div class="fc-icon green">👩‍🎓</div>
                 <div class="fc-title">For Students</div>
@@ -453,7 +519,7 @@ include 'includes/header.php';
                         <i class="bi bi-person-plus"></i> Register Now
                     </a>
                     <a href="student/login.php" class="btn-glass">
-                        <i class="bi bi-box-arrow-in-right"></i> Student Login
+                        <i class="bi bi-box-arrow-in-right"></i> Login
                     </a>
                 </div>
                 <hr class="fc-divider">
@@ -465,34 +531,8 @@ include 'includes/header.php';
             </div>
         </div>
 
-        <!-- Admins -->
-        <div class="col-md-4">
-            <div class="feature-card glass" style="animation-delay:.12s">
-                <div class="fc-icon indigo">🛡️</div>
-                <div class="fc-title">For Administrators</div>
-                <div class="fc-desc">
-                    Manage elections, upload eligible IDs, add candidates,
-                    and view real-time results with comprehensive analytics.
-                </div>
-                <div class="d-grid gap-2 mb-3">
-                    <a href="admin/login.php" class="btn-glass primary">
-                        <i class="bi bi-shield-lock"></i> Admin Login
-                    </a>
-                    <a href="admin/register.php" class="btn-glass">
-                        <i class="bi bi-person-plus"></i> Register Admin
-                    </a>
-                </div>
-                <hr class="fc-divider">
-                <div class="fc-footer">
-                    <i class="bi bi-bar-chart text-primary"></i> Real-time results
-                    <span class="dot">•</span>
-                    <i class="bi bi-cloud-upload text-primary"></i> Bulk upload
-                </div>
-            </div>
-        </div>
-
         <!-- Current Election -->
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="feature-card glass" style="animation-delay:.19s">
                 <div class="fc-icon amber">📅</div>
                 <div class="fc-title">Current Election</div>

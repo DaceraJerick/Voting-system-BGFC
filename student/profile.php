@@ -176,31 +176,31 @@ include '../includes/header.php';
 ?>
 
 <style>
-/* ── Soft Glass Profile Styles ── */
-.profile-banner { background: #6366f1; color: white; padding: 3rem 2rem 7rem; border-radius: 30px; margin-bottom: 2rem; position: relative; overflow: hidden; }
-.profile-banner::after { content: ''; position: absolute; width: 300px; height: 300px; background: rgba(255,255,255,0.05); border-radius: 50%; top: -100px; right: -100px; }
+/* ── Dark Glass Profile Styles ── */
+.profile-banner { background: linear-gradient(135deg, rgba(9,12,20,0.95), rgba(15,23,42,0.95)); color: #e2e8f0; padding: 3rem 2rem 7rem; border-radius: 30px; margin-bottom: 2rem; position: relative; overflow: hidden; }
+.profile-banner::after { content: ''; position: absolute; width: 300px; height: 300px; background: rgba(99,102,241,0.16); border-radius: 50%; top: -100px; right: -100px; }
 .profile-content { margin: -5rem 1.5rem 0; position: relative; z-index: 10; }
-.badge-v { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 0.35rem 1rem; border-radius: 99px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; }
+.badge-v { background: rgba(99,102,241,0.14); backdrop-filter: blur(10px); padding: 0.35rem 1rem; border-radius: 99px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; color: #e2e8f0; }
 .profile-grid-desktop { display: grid; grid-template-columns: 1fr 400px; gap: 2rem; }
-.avatar-wrap { width: 130px; height: 130px; border-radius: 40px; position: relative; margin-bottom: 2rem; background: white; padding: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+.avatar-wrap { width: 130px; height: 130px; border-radius: 40px; position: relative; margin-bottom: 2rem; background: rgba(15,17,23,0.95); padding: 6px; box-shadow: 0 14px 40px rgba(0,0,0,0.28); }
 .profile-img { width: 100%; height: 100%; border-radius: 34px; object-fit: cover; }
-.avatar-placeholder { width: 100%; height: 100%; border-radius: 34px; background: #eef2ff; color: #6366f1; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
-.btn-cam { position: absolute; bottom: -5px; right: -5px; background: #6366f1; color: white; width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid white; transition: all 0.2s; }
-.btn-cam:hover { transform: scale(1.1); background: #4f46e5; }
-.app-input { width: 100%; background: rgba(255, 255, 255, 0.6); border: 1px solid #e2e8f0; padding: 0.8rem 1.25rem; border-radius: 16px; margin-bottom: 1.25rem; font-weight: 600; color: #1e293b; transition: all 0.2s; }
-.app-input:focus { background: white; border-color: #6366f1; outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-.app-input[readonly] { background: #f8f9fa; color: #94a3b8; cursor: not-allowed; }
-.setting-label { font-size: 0.75rem; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem; margin-left: 0.25rem; }
-.btn-save { background: #6366f1; color: white; border: none; width: 100%; padding: 1rem; border-radius: 16px; font-weight: 800; transition: all 0.2s; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2); }
-.btn-save:hover { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3); }
-.tile-btn { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 20px; padding: 1.5rem; text-decoration: none; color: inherit; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; transition: all 0.2s; }
-.tile-btn:hover { background: rgba(255, 255, 255, 0.8); border-color: #6366f1; transform: translateY(-3px); }
+.avatar-placeholder { width: 100%; height: 100%; border-radius: 34px; background: rgba(99,102,241,0.16); color: #c7d2fe; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+.btn-cam { position: absolute; bottom: -5px; right: -5px; background: #10b981; color: white; width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid rgba(255,255,255,0.15); transition: all 0.2s; }
+.btn-cam:hover { transform: scale(1.1); background: #0f766e; }
+.app-input { width: 100%; background: rgba(15,17,23,0.8); border: 1px solid rgba(99,102,241,0.16); padding: 0.8rem 1.25rem; border-radius: 16px; margin-bottom: 1.25rem; font-weight: 600; color: #e2e8f0; transition: all 0.2s; }
+.app-input:focus { background: rgba(15,17,23,0.96); border-color: #6366f1; outline: none; box-shadow: 0 0 0 4px rgba(99,102,241,0.16); }
+.app-input[readonly] { background: rgba(15,17,23,0.66); color: #94a3b8; cursor: not-allowed; }
+.setting-label { font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem; margin-left: 0.25rem; }
+.btn-save { background: #10b981; color: white; border: none; width: 100%; padding: 1rem; border-radius: 16px; font-weight: 800; transition: all 0.2s; box-shadow: 0 6px 20px rgba(16,185,129,0.25); }
+.btn-save:hover { background: #0f766e; transform: translateY(-2px); box-shadow: 0 8px 22px rgba(16,185,129,0.35); }
+.tile-btn { background: rgba(13,15,27,0.86); backdrop-filter: blur(10px); border: 1px solid rgba(99,102,241,0.16); border-radius: 20px; padding: 1.5rem; text-decoration: none; color: #e2e8f0; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; transition: all 0.2s; }
+.tile-btn:hover { background: rgba(99,102,241,0.18); border-color: #6366f1; transform: translateY(-3px); }
 .tile-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 0.5rem; }
-.tile-lbl { font-size: 0.85rem; font-weight: 800; color: #1e293b; }
-.tile-sub { font-size: 0.65rem; color: #64748b; font-weight: 600; }
+.tile-lbl { font-size: 0.85rem; font-weight: 800; color: #e2e8f0; }
+.tile-sub { font-size: 0.65rem; color: #94a3b8; font-weight: 600; }
 .tiles-row { display: flex; gap: 1rem; }
-.bg-gold { background: #fefce8; color: #ca8a04; }
-.bg-blue { background: #eff6ff; color: #2563eb; }
+.bg-gold { background: rgba(251,191,36,0.18); color: #fde68a; }
+.bg-blue { background: rgba(99,102,241,0.18); color: #c7d2fe; }
 
 @media (max-width: 991px) {
     .profile-grid-desktop { grid-template-columns: 1fr; }
@@ -246,12 +246,12 @@ include '../includes/header.php';
             </form>
 
             <?php if($success): ?>
-                <div class="app-card" style="border-color:#22c55e; background:#f0fdf4; padding:0.85rem 1rem;">
+                <div class="app-card" style="border-color:#22c55e; background: rgba(15,17,23,0.92); padding:0.85rem 1rem;">
                     <p class="small fw-bold text-success mb-0"><i class="bi bi-check-circle-fill me-2"></i> <?php echo $success; ?></p>
                 </div>
             <?php endif; ?>
             <?php if($error): ?>
-                <div class="app-card" style="border-color:#ef4444; background:#fef2f2; padding:0.85rem 1rem;">
+                <div class="app-card" style="border-color:#ef4444; background: rgba(15,17,23,0.92); padding:0.85rem 1rem;">
                     <p class="small fw-bold text-danger mb-0"><i class="bi bi-exclamation-circle-fill me-2"></i> <?php echo $error; ?></p>
                 </div>
             <?php endif; ?>
@@ -298,7 +298,7 @@ include '../includes/header.php';
                         <li class="p-4 border-bottom border-light">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="small fw-bold text-indigo-900 d-block"><?php echo ucfirst(str_replace('_', ' ', $item['field_name'])); ?> Updated</span>
+                                    <span class="small fw-bold text-success d-block"><?php echo ucfirst(str_replace('_', ' ', $item['field_name'])); ?> Updated</span>
                                     <span class="text-muted" style="font-size:0.75rem;">Successfully updated on your account.</span>
                                 </div>
                                 <span class="small text-muted" style="font-size:0.65rem;"><?php echo date('M d', strtotime($item['changed_at'])); ?></span>

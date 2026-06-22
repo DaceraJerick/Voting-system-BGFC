@@ -23,6 +23,11 @@ if(!$election) {
     exit();
 }
 
+if($election['is_paused'] == 1) {
+    header("Location: dashboard.php?msg=election_paused");
+    exit();
+}
+
 // IMPORTANT FIX: Check if student has already voted in THIS SPECIFIC election
 $stmt = $pdo->prepare("
     SELECT COUNT(*) FROM votes 
@@ -90,29 +95,106 @@ include '../includes/header.php';
 ?>
 
 <style>
-/* ── Soft Glass Voting Interface ── */
-.vote-header { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.4); padding: 2.5rem; border-radius: 30px; margin-bottom: 2rem; color: #1e293b; box-shadow: 0 8px 32px rgba(0,0,0,0.02); }
-.election-timer { background: #6366f1; color: white; padding: 0.75rem 1.5rem; border-radius: 99px; display: inline-flex; align-items: center; gap: 0.75rem; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+/* ── Dark Glass Voting Interface ── */
+.vote-header { background: rgba(13,15,27,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(99,102,241,0.16); padding: 2.5rem; border-radius: 30px; margin-bottom: 2rem; color: #e2e8f0; box-shadow: 0 18px 45px rgba(0,0,0,0.28); }
+.election-timer { background: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 99px; display: inline-flex; align-items: center; gap: 0.75rem; box-shadow: 0 6px 22px rgba(16,185,129,0.24); }
 .position-card { background: transparent; border: none; margin-bottom: 3rem; }
 .position-header { margin-bottom: 1.5rem; padding-left: 0.5rem; }
-.position-title { font-size: 1.35rem; font-weight: 800; color: #1e1b4b; margin: 0; display: flex; align-items: center; gap: 0.75rem; }
+.position-title { font-size: 1.35rem; font-weight: 800; color: #e2e8f0; margin: 0; display: flex; align-items: center; gap: 0.75rem; }
 .candidate-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-.candidate-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 28px; padding: 2rem; text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
-.candidate-card:hover { transform: translateY(-8px); background: rgba(255, 255, 255, 0.8); box-shadow: 0 12px 40px rgba(99, 102, 241, 0.1); border-color: #6366f1; }
-.candidate-card.selected { border: 2px solid #6366f1; background: #f5f3ff; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.2); }
-.candidate-photo { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: 0 auto 1.25rem; }
-.candidate-name { font-size: 1.15rem; font-weight: 800; color: #1e293b; margin-bottom: 0.25rem; }
-.candidate-id { font-size: 0.75rem; font-weight: 700; color: #94a3b8; background: #f1f5f9; padding: 0.35rem 0.75rem; border-radius: 99px; display: inline-block; margin-bottom: 1.25rem; }
-.candidate-platform { background: white; padding: 1rem; border-radius: 16px; font-size: 0.85rem; color: #64748b; line-height: 1.6; height: 100px; overflow-y: auto; text-align: left; border: 1px solid #f1f5f9; }
-.select-indicator { display: inline-flex; width: 28px; height: 28px; border: 2px solid #e2e8f0; border-radius: 50%; align-items: center; justify-content: center; transition: all 0.2s; background: white; }
-.candidate-card.selected .select-indicator { background: #6366f1; border-color: #6366f1; color: white; }
-.btn-submit-vote { background: #6366f1; color: white; border: none; padding: 1.15rem 3.5rem; border-radius: 99px; font-size: 1.1rem; font-weight: 800; transition: all 0.3s; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); }
-.btn-submit-vote:hover { transform: translateY(-3px) scale(1.02); background: #4f46e5; box-shadow: 0 12px 30px rgba(99, 102, 241, 0.5); color: white; }
-.vote-instructions { background: rgba(99, 102, 241, 0.05); border-left: 5px solid #6366f1; padding: 1.5rem 2rem; border-radius: 20px; margin-bottom: 2.5rem; color: #3730a3; }
+.candidate-card { background: rgba(15,17,23,0.86); backdrop-filter: blur(10px); border: 1px solid rgba(99,102,241,0.16); border-radius: 28px; padding: 2rem; text-align: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; box-shadow: 0 10px 35px rgba(0,0,0,0.24); }
+.candidate-card:hover { transform: translateY(-8px); background: rgba(99,102,241,0.16); box-shadow: 0 14px 45px rgba(0,0,0,0.32); border-color: #6366f1; }
+.candidate-card.selected { border: 2px solid #10b981; background: rgba(16,185,129,0.16); box-shadow: 0 14px 40px rgba(16,185,129,0.18); }
+.candidate-photo { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(99,102,241,0.18); box-shadow: 0 6px 20px rgba(0,0,0,0.25); margin: 0 auto 1.25rem; }
+.candidate-name { font-size: 1.15rem; font-weight: 800; color: #e2e8f0; margin-bottom: 0.25rem; }
+.candidate-id { font-size: 0.75rem; font-weight: 700; color: #94a3b8; background: rgba(15,17,23,0.8); padding: 0.35rem 0.75rem; border-radius: 99px; display: inline-block; margin-bottom: 1.25rem; }
+.candidate-platform { background: rgba(15,17,23,0.85); padding: 1rem; border-radius: 16px; font-size: 0.85rem; color: #cbd5e1; line-height: 1.6; height: 100px; overflow-y: auto; text-align: left; border: 1px solid rgba(99,102,241,0.12); }
+.select-indicator { display: inline-flex; width: 28px; height: 28px; border: 2px solid rgba(99,102,241,0.18); border-radius: 50%; align-items: center; justify-content: center; transition: all 0.2s; background: rgba(15,17,23,0.7); color: #94a3b8; }
+.candidate-card.selected .select-indicator { background: #10b981; border-color: #10b981; color: white; }
+.btn-submit-vote { background: #10b981; color: white; border: none; padding: 1.15rem 3.5rem; border-radius: 99px; font-size: 1.1rem; font-weight: 800; transition: all 0.3s; box-shadow: 0 10px 30px rgba(16,185,129,0.32); }
+.btn-submit-vote:hover { transform: translateY(-3px) scale(1.02); background: #0f766e; box-shadow: 0 12px 30px rgba(16,185,129,0.4); color: white; }
+.vote-instructions { background: rgba(99,102,241,0.12); border-left: 5px solid #10b981; padding: 1.5rem 2rem; border-radius: 20px; margin-bottom: 2.5rem; color: #cbd5e1; }
 
 @media (max-width: 991px) {
     .vote-header { padding: 1.5rem; }
     .display-5 { font-size: 2rem; }
+}
+
+/* =========================================
+   LIGHT MODE OVERRIDES
+   ========================================= */
+[data-theme="light"] .vote-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+[data-theme="light"] .vote-header h1,
+[data-theme="light"] .vote-header h2,
+[data-theme="light"] .vote-header p,
+[data-theme="light"] .vote-header .lead {
+    color: #1e293b !important;
+}
+[data-theme="light"] .vote-header i:not(.bi-clock) {
+    color: #1e293b;
+}
+
+[data-theme="light"] .vote-instructions {
+    background: rgba(99, 102, 241, 0.08);
+    color: #475569;
+}
+[data-theme="light"] .vote-instructions h5 {
+    color: #1e293b;
+}
+[data-theme="light"] .vote-instructions ul li {
+    color: #475569;
+}
+
+[data-theme="light"] .position-title {
+    color: #1e293b;
+}
+
+[data-theme="light"] .candidate-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+[data-theme="light"] .candidate-card:hover {
+    background: #ffffff;
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+}
+[data-theme="light"] .candidate-card.selected {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: #10b981;
+}
+
+[data-theme="light"] .candidate-name {
+    color: #1e293b;
+}
+[data-theme="light"] .candidate-id {
+    background: rgba(0, 0, 0, 0.05);
+    color: #475569;
+}
+[data-theme="light"] .candidate-platform {
+    background: #f8fafc;
+    border-color: rgba(0, 0, 0, 0.06);
+    color: #475569;
+}
+[data-theme="light"] .select-indicator {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #94a3b8;
+}
+[data-theme="light"] .candidate-card.selected .select-indicator {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+[data-theme="light"] .candidate-card .fw-bold {
+    color: #475569;
+}
+[data-theme="light"] .candidate-card.selected .fw-bold {
+    color: #10b981;
 }
 </style>
 
@@ -148,7 +230,7 @@ include '../includes/header.php';
 <div class="vote-instructions">
     <div class="d-flex">
         <div class="me-3">
-            <i class="bi bi-info-circle-fill text-primary fs-2"></i>
+            <i class="bi bi-info-circle-fill text-success fs-2"></i>
         </div>
         <div>
             <h5 class="fw-bold mb-2">How to Vote:</h5>

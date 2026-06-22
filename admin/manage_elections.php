@@ -50,12 +50,28 @@ if(isset($_GET['delete_election'])) {
 if(isset($_POST['edit_election'])) {
     try {
         $start_date = str_replace('T', ' ', $_POST['start_date']);
-        $end_date = str_replace('T', ' ', $_POST['end_date']);
+        $end_date   = str_replace('T', ' ', $_POST['end_date']);
         if (strlen($start_date) == 16) $start_date .= ':00';
-        if (strlen($end_date) == 16) $end_date .= ':00';
+        if (strlen($end_date)   == 16) $end_date   .= ':00';
 
-        $pdo->prepare("UPDATE elections SET title=?, start_date=?, end_date=? WHERE id=?")
-            ->execute([trim($_POST['title']), $start_date, $end_date, $_POST['election_id']]);
+        // application_end always equals start_date (app window closes when voting opens)
+        $app_end = $start_date;
+
+        // If admin provided a new app_start, use it; otherwise keep the existing one
+        $app_start = null;
+        if (!empty($_POST['app_start'])) {
+            $app_start = str_replace('T', ' ', $_POST['app_start']);
+            if (strlen($app_start) == 16) $app_start .= ':00';
+        }
+
+        if ($app_start !== null) {
+            $pdo->prepare("UPDATE elections SET title=?, start_date=?, end_date=?, application_start=?, application_end=? WHERE id=?")
+                ->execute([trim($_POST['title']), $start_date, $end_date, $app_start, $app_end, $_POST['election_id']]);
+        } else {
+            // No app_start submitted — still sync application_end to new start_date
+            $pdo->prepare("UPDATE elections SET title=?, start_date=?, end_date=?, application_end=? WHERE id=?")
+                ->execute([trim($_POST['title']), $start_date, $end_date, $app_end, $_POST['election_id']]);
+        }
         $message = "Election updated successfully!";
     } catch(PDOException $e) { $error = "Error updating election: " . $e->getMessage(); }
 }
@@ -75,14 +91,29 @@ if(isset($_GET['deactivate'])) {
     } catch(PDOException $e) { $error = "Error: " . $e->getMessage(); }
 }
 
+if(isset($_GET['pause'])) {
+    try {
+        $pdo->prepare("UPDATE elections SET is_paused=1 WHERE id=? AND is_active=1")->execute([$_GET['pause']]);
+        header("Location: manage_elections.php?msg=paused"); exit();
+    } catch(PDOException $e) { $error = "Error: " . $e->getMessage(); }
+}
+
+if(isset($_GET['resume'])) {
+    try {
+        $pdo->prepare("UPDATE elections SET is_paused=0 WHERE id=?")->execute([$_GET['resume']]);
+        header("Location: manage_elections.php?msg=resumed"); exit();
+    } catch(PDOException $e) { $error = "Error: " . $e->getMessage(); }
+}
+
 if(isset($_GET['msg'])) {
-    $msgs = ['deleted'=>'Election deleted successfully!','activated'=>'Election activated!','deactivated'=>'Election deactivated.'];
+    $msgs = ['deleted'=>'Election deleted successfully!','activated'=>'Election activated!','deactivated'=>'Election deactivated.','paused'=>'Election paused! Voting is temporarily suspended.','resumed'=>'Election resumed! Voting is active again.'];
     if(isset($msgs[$_GET['msg']])) $message = $msgs[$_GET['msg']];
 }
 
 $elections = $pdo->query("
     SELECT e.*,
         CASE
+            WHEN e.is_active=1 AND e.is_paused=1 AND NOW() BETWEEN e.start_date AND e.end_date THEN 'paused'
             WHEN e.is_active=1 AND NOW() BETWEEN e.start_date AND e.end_date THEN 'active'
             WHEN NOW() > e.end_date THEN 'ended'
             WHEN NOW() < e.start_date THEN 'upcoming'
@@ -191,7 +222,9 @@ include '../includes/header.php';
 .sp-ended   {background:rgba(148,163,184,.1);border:1px solid rgba(148,163,184,.2);color:#64748b;}
 .sp-upcoming{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:#92400e;}
 .sp-pending {background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);color:#6366f1;}
+.sp-paused  {background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.28);color:#ea580c;}
 .live-dot   {width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.2);animation:pulse 2s infinite;}
+.pause-dot  {width:7px;height:7px;border-radius:50%;background:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.2);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 .el-body { padding:1.1rem 1.4rem; }
@@ -321,6 +354,106 @@ include '../includes/header.php';
 @keyframes popIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 </style>
 
+<style>
+  :root {
+    --glass-bg: rgba(255, 255, 255, 0.88);
+    --glass-border: rgba(15, 127, 99, 0.14);
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --accent: #0f7f63;
+  }
+
+  body {
+    background:
+      radial-gradient(at 0% 0%, rgba(15,127,99,0.22) 0px, transparent 55%),
+      radial-gradient(at 100% 0%, rgba(16,185,129,0.18) 0px, transparent 45%),
+      radial-gradient(at 100% 100%, rgba(15,127,99,0.10) 0px, transparent 45%),
+      radial-gradient(at 0% 100%, rgba(94,234,212,0.09) 0px, transparent 40%),
+      #f4fbf7;
+    background-attachment: fixed;
+    color: var(--text-main) !important;
+  }
+
+  .page-wrap {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 1.5rem 1.75rem 4rem;
+  }
+
+  .glass {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 22px 60px rgba(15,127,99,0.08) !important;
+  }
+
+  .page-hdr {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+    margin-bottom: 1.75rem !important;
+  }
+  .page-hdr h2 { color: #0f172a !important; }
+  .page-hdr p { color: #64748b !important; }
+
+  .warn-banner {
+    background: rgba(255,255,255,0.95) !important;
+    border-color: rgba(15,127,99,0.12) !important;
+    box-shadow: 0 20px 45px rgba(15,127,99,0.08) !important;
+  }
+
+  .btn-primary-glass {
+    color: #fff !important;
+    background: linear-gradient(135deg, #6366f1, #818cf8) !important;
+  }
+
+  .alert-glass { background: rgba(255,255,255,0.95) !important; border-color: rgba(15,127,99,0.12) !important; color: #0f172a !important; }
+  .alert-glass.success { background: rgba(220,252,231,0.96) !important; }
+  .alert-glass.danger { background: rgba(254,226,226,0.96) !important; }
+  .alert-glass.warning { background: rgba(254,249,195,0.96) !important; }
+
+  .el-card { background: rgba(255,255,255,0.86) !important; border-color: rgba(15,127,99,0.12) !important; }
+  .el-head { background: rgba(255,255,255,0.92) !important; border-color: rgba(15,127,99,0.12) !important; }
+  .el-title { color: #0f172a !important; }
+  .el-date { color: #64748b !important; }
+
+  .sbox { background: rgba(255,255,255,0.95) !important; border-color: rgba(255,255,255,0.95) !important; }
+  .sbox-num { color: #0f172a !important; }
+  .sbox-lbl { color: #64748b !important; }
+
+  .btn-save { background: linear-gradient(135deg, #6366f1, #818cf8) !important; color: #fff !important; }
+  .btn-cancel { background: rgba(255,255,255,0.95) !important; color: #475569 !important; border-color: rgba(15,127,99,0.12) !important; }
+  .btn-del { background: linear-gradient(135deg, #ef4444, #f87171) !important; color: #fff !important; }
+
+  .modal-glass .modal-content { background: rgba(255,255,255,0.95) !important; border-color: rgba(255,255,255,0.95) !important; }
+  .modal-head-custom { background: rgba(255,255,255,0.95) !important; border-color: rgba(15,127,99,0.12) !important; }
+  .modal-head-custom h5 { color: #0f172a !important; }
+
+  [data-theme="dark"] body {
+    background:
+      radial-gradient(at 0% 0%, rgba(99,102,241,0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(139,92,246,0.06) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(16,185,129,0.05) 0px, transparent 50%),
+      #0d0f1a !important;
+    color: #e2e8f0 !important;
+  }
+
+  [data-theme="dark"] .glass { background: rgba(20,22,35,0.88) !important; border-color: rgba(99,102,241,0.14) !important; box-shadow: 0 18px 44px rgba(0,0,0,0.45) !important; }
+  [data-theme="dark"] .el-card { background: rgba(15,17,23,0.9) !important; border-color: rgba(99,102,241,0.12) !important; }
+  [data-theme="dark"] .el-head { background: rgba(20,22,35,0.94) !important; border-color: rgba(99,102,241,0.12) !important; }
+  [data-theme="dark"] .el-title { color: #e2e8f0 !important; }
+  [data-theme="dark"] .el-date, [data-theme="dark"] .warn-banner p, [data-theme="dark"] .warn-banner h6, [data-theme="dark"] .sbox-lbl { color: #94a3b8 !important; }
+  [data-theme="dark"] .sbox { background: rgba(20,22,35,0.78) !important; border-color: rgba(99,102,241,0.12) !important; }
+  [data-theme="dark"] .prog-track { background: rgba(255,255,255,0.08) !important; }
+  [data-theme="dark"] .prog-fill { background: linear-gradient(90deg, #6366f1, #a78bfa) !important; }
+  [data-theme="dark"] .btn-cancel { background: rgba(15,17,23,0.86) !important; color: #94a3b8 !important; border-color: rgba(99,102,241,0.12) !important; }
+  [data-theme="dark"] .btn-save { background: linear-gradient(135deg, #6366f1, #818cf8) !important; }
+  [data-theme="dark"] .btn-del { background: rgba(255,255,255,0.08) !important; color: #fecdd3 !important; border-color: rgba(239,68,68,0.28) !important; }
+  [data-theme="dark"] .modal-content { background: rgba(15,17,23,0.92) !important; border-color: rgba(99,102,241,0.16) !important; }
+  [data-theme="dark"] .modal-head-custom { background: rgba(20,22,35,0.93) !important; }
+</style>
+
 <div class="page-wrap">
 
     <!-- Page Header -->
@@ -364,6 +497,7 @@ include '../includes/header.php';
             $pill_class = 'sp-pending'; $pill_label = 'Pending';
             $card_class = 'st-pending';
             if($st=='active')    { $pill_class='sp-active';   $pill_label='Active';   $card_class='st-active'; }
+            elseif($st=='paused'){ $pill_class='sp-paused';   $pill_label='Paused';   $card_class='st-upcoming'; }
             elseif($st=='ended') { $pill_class='sp-ended';    $pill_label='Ended';    $card_class='st-ended'; }
             elseif($st=='upcoming'){ $pill_class='sp-upcoming'; $pill_label='Upcoming'; $card_class='st-upcoming'; }
 
@@ -380,9 +514,13 @@ include '../includes/header.php';
             <div>
                 <div class="el-title">
                     <?php echo htmlspecialchars($el['title']); ?>
-                    <?php if($el['is_active']): ?>
+                    <?php if($el['is_active'] && !$el['is_paused']): ?>
                         <span class="sp sp-active ms-2" style="vertical-align:middle;">
                             <span class="live-dot"></span> Live
+                        </span>
+                    <?php elseif($el['is_active'] && $el['is_paused']): ?>
+                        <span class="sp sp-paused ms-2" style="vertical-align:middle;">
+                            <span class="pause-dot"></span> Paused
                         </span>
                     <?php endif; ?>
                 </div>
@@ -453,8 +591,22 @@ include '../includes/header.php';
                     <?php if($el['is_active']): ?>
                     <a href="?deactivate=<?php echo $el['id']; ?>" class="abtn abtn-amber"
                        onclick="return confirm('Deactivate this election?')">
-                        <i class="bi bi-pause-circle"></i> Deactivate
+                        <i class="bi bi-stop-circle"></i> Deactivate
                     </a>
+
+                    <!-- Pause / Resume (only for active elections) -->
+                    <?php if($el['is_paused']): ?>
+                    <a href="?resume=<?php echo $el['id']; ?>" class="abtn abtn-green"
+                       onclick="return confirm('Resume voting for this election?')">
+                        <i class="bi bi-play-circle"></i> Resume
+                    </a>
+                    <?php else: ?>
+                    <a href="?pause=<?php echo $el['id']; ?>" class="abtn abtn-amber"
+                       onclick="return confirm('Pause voting? Students will not be able to cast votes while paused. Applications are NOT affected.')">
+                        <i class="bi bi-pause-circle"></i> Pause
+                    </a>
+                    <?php endif; ?>
+
                     <?php else: ?>
                     <a href="?activate=<?php echo $el['id']; ?>" class="abtn abtn-green"
                        onclick="return confirm('Activate this election? Any currently active election will be deactivated.')">
@@ -510,6 +662,20 @@ include '../includes/header.php';
                                        value="<?php echo date('Y-m-d\TH:i', strtotime($el['end_date'])); ?>" required>
                             </div>
                         </div>
+
+                        <?php if(!empty($el['application_start'])): ?>
+                        <div class="mt-3">
+                            <label class="field-label">
+                                <i class="bi bi-person-plus" style="color:#10b981;margin-right:3px;"></i>
+                                Applications Open Date &amp; Time
+                            </label>
+                            <input type="datetime-local" name="app_start" class="input-glass"
+                                   value="<?php echo date('Y-m-d\TH:i', strtotime($el['application_start'])); ?>">
+                            <div style="font-size:.75rem;color:#94a3b8;margin-top:.3rem;">
+                                Application window closes automatically when voting starts. Leave unchanged to keep current.
+                            </div>
+                        </div>
+                        <?php endif; ?>
 
                         <?php if($el['is_active']): ?>
                         <div class="alert-glass warning mt-3" style="margin-bottom:0;">

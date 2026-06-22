@@ -23,6 +23,11 @@ if(!$election) {
     exit();
 }
 
+if($election['is_paused'] == 1) {
+    header("Location: dashboard.php?msg=election_paused");
+    exit();
+}
+
 // IMPORTANT FIX: Check if student has already voted in THIS SPECIFIC election
 $stmt = $pdo->prepare("
     SELECT COUNT(*) FROM votes 
@@ -103,25 +108,25 @@ include '../includes/header.php';
 
 
 <style>
-/* ── Soft Glass Confirmation Interface ── */
+/* ── Dark Glass Confirmation Interface ── */
 .confirmation-container { max-width: 800px; margin: 0 auto; padding-bottom: 5rem; }
-.confirmation-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.4); border-radius: 35px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.03); }
-.confirmation-header { background: #6366f1; color: white; padding: 4rem 2rem; text-align: center; position: relative; overflow: hidden; }
-.confirmation-header::after { content: ''; position: absolute; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; top: -50px; right: -50px; }
+.confirmation-card { background: rgba(13,15,27,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(99,102,241,0.16); border-radius: 35px; overflow: hidden; box-shadow: 0 18px 50px rgba(0,0,0,0.32); }
+.confirmation-header { background: linear-gradient(135deg, rgba(6,95,70,0.95), rgba(15,34,48,0.95)); color: white; padding: 4rem 2rem; text-align: center; position: relative; overflow: hidden; }
+.confirmation-header::after { content: ''; position: absolute; width: 200px; height: 200px; background: rgba(99,102,241,0.16); border-radius: 50%; top: -50px; right: -50px; }
 .confirmation-icon { font-size: 5rem; margin-bottom: 1.5rem; display: block; }
 .confirmation-title { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem; }
 .confirmation-subtitle { font-size: 1.1rem; font-weight: 600; opacity: 0.9; }
-.vote-timestamp { background: rgba(255,255,255,0.15); padding: 0.6rem 1.5rem; border-radius: 99px; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 700; margin-top: 1.5rem; }
+.vote-timestamp { background: rgba(99,102,241,0.14); padding: 0.6rem 1.5rem; border-radius: 99px; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 700; margin-top: 1.5rem; }
 .confirmation-body { padding: 3rem 2.5rem; }
-.summary-table { background: rgba(255,255,255,0.5); border: 1px solid #f1f5f9; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; }
-.summary-item { display: flex; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f1f5f9; }
+.summary-table { background: rgba(15,17,23,0.85); border: 1px solid rgba(99,102,241,0.16); border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; }
+.summary-item { display: flex; align-items: center; padding: 1rem 0; border-bottom: 1px solid rgba(99,102,241,0.12); }
 .summary-item:last-child { border-bottom: none; }
-.position-badge { background: #eef2ff; color: #6366f1; padding: 0.35rem 0.85rem; border-radius: 99px; font-size: 0.75rem; font-weight: 800; margin-right: 1rem; min-width: 130px; text-align: center; }
-.btn-return { background: #6366f1; color: white; border: none; padding: 1.15rem 2.5rem; border-radius: 99px; font-size: 1.1rem; font-weight: 800; transition: all 0.3s; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3); text-decoration: none; display: inline-block; }
-.btn-return:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4); color: white; }
+.position-badge { background: rgba(34,197,94,0.18); color: #a7f3d0; padding: 0.35rem 0.85rem; border-radius: 99px; font-size: 0.75rem; font-weight: 800; margin-right: 1rem; min-width: 130px; text-align: center; }
+.btn-return { background: #10b981; color: white; border: none; padding: 1.15rem 2.5rem; border-radius: 99px; font-size: 1.1rem; font-weight: 800; transition: all 0.3s; box-shadow: 0 12px 35px rgba(16,185,129,0.25); text-decoration: none; display: inline-block; }
+.btn-return:hover { transform: translateY(-3px); box-shadow: 0 14px 35px rgba(16,185,129,0.3); color: white; }
 .review-card { background: transparent; }
-.review-item { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; background: rgba(255,255,255,0.6); border-radius: 16px; margin-bottom: 0.75rem; border: 1px solid rgba(255,255,255,0.5); }
-.election-id-badge { font-family: monospace; background: #e9ecef; padding: 3px 10px; border-radius: 5px; font-size: 0.8rem; }
+.review-item { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; background: rgba(13,15,27,0.85); border-radius: 16px; margin-bottom: 0.75rem; border: 1px solid rgba(99,102,241,0.16); }
+.election-id-badge { font-family: monospace; background: rgba(99,102,241,0.12); padding: 3px 10px; border-radius: 5px; font-size: 0.8rem; color: #e2e8f0; }
 </style>
 
 <div class="confirmation-container">
@@ -227,7 +232,7 @@ include '../includes/header.php';
     <?php else: ?>
         <!-- Review Vote View -->
         <div class="confirmation-card">
-            <div class="confirmation-header" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7);">
+            <div class="confirmation-header" style="background: linear-gradient(135deg, #0f7f63, #22c55e);">
                 <i class="bi bi-check2-square confirmation-icon"></i>
                 <h1 class="confirmation-title">Review Your Vote</h1>
                 <p class="lead mb-0">Please review your selections before confirming.</p>

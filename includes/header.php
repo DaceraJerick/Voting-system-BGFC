@@ -26,9 +26,19 @@ if(file_exists($base_path . 'includes/election_scheduler.php') && isset($GLOBALS
 }
 
 $has_active_election = checkActiveElection($base_path);
+
+$pending_apps_count = 0;
+if(isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin') {
+    if(isset($GLOBALS['pdo'])) {
+        try {
+            $stmt_apps = $GLOBALS['pdo']->query("SELECT COUNT(*) FROM candidate_applications WHERE status = 'pending'");
+            $pending_apps_count = $stmt_apps->fetchColumn();
+        } catch(Exception $e) {}
+    }
+}
 ?>
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
@@ -39,7 +49,7 @@ $has_active_election = checkActiveElection($base_path);
     <script>
     /* Apply saved theme ASAP to prevent flash */
     (function(){
-        var t = localStorage.getItem('cv_theme') || 'light';
+        var t = localStorage.getItem('cv_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', t);
     })();
     </script>
@@ -51,19 +61,36 @@ $has_active_election = checkActiveElection($base_path);
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-        --accent:      #6366f1;
-        --accent-soft: rgba(99,102,241,0.1);
-        --accent-mid:  rgba(99,102,241,0.25);
-        --glass-bg:    rgba(255,255,255,0.6);
-        --glass-border:rgba(255,255,255,0.82);
-        --text-hi:     #1e293b;
-        --text-mid:    #475569;
-        --text-lo:     #94a3b8;
-        --radius:      16px;
-        --radius-sm:   10px;
-        --blur:        blur(22px) saturate(160%);
-        --dark-indigo: #1e1b4b;
-        --app-bg:      #f5f7fb;
+        --bg-dark: #060911;
+        --bg-gradient: linear-gradient(180deg, #070b15 0%, #0d1324 100%);
+        --panel-bg: rgba(11,14,26,0.92);
+        --panel-soft: rgba(15,18,34,0.82);
+        --panel-strong: rgba(9,12,20,0.98);
+        --border-soft: rgba(99,102,241,0.18);
+        --border-strong: rgba(99,102,241,0.28);
+        --text-high: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --radius: 20px;
+        --radius-sm: 14px;
+        --shadow-soft: 0 18px 60px rgba(0,0,0,0.35);
+        --accent: #6366f1;
+        --accent-purple: #7c3aed;
+        --accent-cyan: #22d3ee;
+        --accent-green: #34d399;
+    }
+
+    [data-theme="light"] {
+        --bg-dark: #f8fafc;
+        --bg-gradient: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+        --panel-bg: rgba(255,255,255,0.92);
+        --panel-soft: rgba(255,255,255,0.82);
+        --panel-strong: rgba(255,255,255,0.98);
+        --border-soft: rgba(99,102,241,0.12);
+        --border-strong: rgba(99,102,241,0.22);
+        --text-high: #0f172a;
+        --text-secondary: #334155;
+        --text-muted: #64748b;
     }
 
     html { -webkit-tap-highlight-color: transparent; }
@@ -71,15 +98,10 @@ $has_active_election = checkActiveElection($base_path);
     body {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
         min-height: 100vh;
-        background:
-            radial-gradient(ellipse at 10% 20%,  rgba(99,179,237,0.22) 0%, transparent 50%),
-            radial-gradient(ellipse at 85% 10%,  rgba(167,139,250,0.18) 0%, transparent 45%),
-            radial-gradient(ellipse at 60% 80%,  rgba(110,231,183,0.18) 0%, transparent 45%),
-            radial-gradient(ellipse at 20% 85%,  rgba(251,191,36,0.13) 0%, transparent 40%),
-            #eef2ff;
+        background: var(--bg-gradient);
         background-attachment: fixed;
         overflow-x: hidden;
-        color: var(--text-hi);
+        color: var(--text-high);
     }
 
     /* drifting blobs */
@@ -105,10 +127,10 @@ $has_active_election = checkActiveElection($base_path);
     /* ── Navbar ── */
     .navbar {
         padding: 0 !important;
-        background: var(--dark-indigo) !important;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        background: linear-gradient(135deg, rgba(17,77,56,0.95), rgba(15,127,99,0.98)) !important;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
         position: sticky; top: 0; z-index: 1000;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 6px 26px rgba(14, 77, 50, 0.16);
     }
 
     .navbar > .container {
@@ -126,13 +148,13 @@ $has_active_election = checkActiveElection($base_path);
         padding: 0;
     }
     .brand-icon {
-        width: 36px; height: 36px; border-radius: 10px;
-        background: rgba(255,255,255,0.15);
+        width: 36px; height: 36px; border-radius: 12px;
+        background: linear-gradient(135deg, rgba(99,102,241,0.24), rgba(124,58,237,0.18));
         display: flex; align-items: center; justify-content: center;
         color: white; font-size: 1.2rem;
         flex-shrink: 0;
     }
-    .brand-text span { color: #818cf8; }
+    .brand-text span { color: rgba(255,255,255,0.72); }
 
     /* toggler */
     .navbar-toggler {
@@ -148,14 +170,14 @@ $has_active_election = checkActiveElection($base_path);
 
     /* collapse panel on mobile */
     .navbar-collapse {
-        background: rgba(255,255,255,0.92);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
+        background: rgba(12,14,24,0.96);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(99,102,241,0.16);
         border-radius: var(--radius);
         padding: 1rem;
         margin-top: 0.75rem;
-        box-shadow: 0 12px 32px rgba(100,120,200,0.12);
+        box-shadow: 0 18px 40px rgba(0,0,0,0.28);
     }
     @media(min-width: 992px) {
         .navbar-collapse {
@@ -175,28 +197,28 @@ $has_active_election = checkActiveElection($base_path);
         font-size: 0.875rem; font-weight: 600;
         padding: 0.8rem 1rem !important;
         border-radius: 12px;
-        color: rgba(255,255,255,0.7) !important;
+        color: rgba(255,255,255,0.8) !important;
         transition: all .2s ease;
     }
     .nav-link:hover {
         color: white !important;
-        background: rgba(255,255,255,0.1);
+        background: rgba(99,102,241,0.18);
     }
     .nav-link i { font-size: 1.1rem; }
 
     @media(min-width: 992px) {
-        .nav-link { color: rgba(255,255,255,0.7) !important; }
+        .nav-link { color: rgba(255,255,255,0.8) !important; }
         .nav-link:hover { color: white !important; }
     }
 
     /* dropdown */
     .dropdown-menu {
-        border: 1px solid var(--glass-border) !important;
+        border: 1px solid rgba(99,102,241,0.16) !important;
         border-radius: var(--radius) !important;
-        box-shadow: 0 12px 32px rgba(100,120,200,0.14) !important;
+        box-shadow: 0 18px 48px rgba(0,0,0,0.28) !important;
         padding: 0.5rem !important;
         margin-top: 0.5rem !important;
-        background: rgba(255,255,255,0.95) !important;
+        background: rgba(10,13,24,0.98) !important;
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         min-width: 210px;
@@ -206,24 +228,24 @@ $has_active_election = checkActiveElection($base_path);
         padding: 0.65rem 0.9rem !important;
         border-radius: var(--radius-sm) !important;
         font-size: 0.875rem; font-weight: 500;
-        color: var(--text-hi) !important;
+        color: rgba(226,232,240,0.9) !important;
         transition: all .18s ease;
         min-height: 40px;
     }
-    .dropdown-item i { font-size: 1rem; width: 20px; text-align: center; color: var(--text-lo); flex-shrink: 0; }
-    .dropdown-item:hover { background: var(--accent-soft) !important; color: var(--accent) !important; }
-    .dropdown-item:hover i { color: var(--accent); }
-    .dropdown-item.text-danger { color: #ef4444 !important; }
-    .dropdown-item.text-danger i { color: #ef4444; }
-    .dropdown-item.text-danger:hover { background: rgba(239,68,68,0.08) !important; }
-    .dropdown-divider { border-color: rgba(200,210,240,0.4) !important; margin: 0.35rem 0 !important; }
-    .dropdown-item-text { font-size: 0.78rem; color: var(--text-lo) !important; padding: 0.4rem 0.9rem !important; }
+    .dropdown-item i { font-size: 1rem; width: 20px; text-align: center; color: rgba(148,163,184,0.9); flex-shrink: 0; }
+    .dropdown-item:hover { background: rgba(99,102,241,0.14) !important; color: #c7d2fe !important; }
+    .dropdown-item:hover i { color: #c7d2fe; }
+    .dropdown-item.text-danger { color: #fca5a5 !important; }
+    .dropdown-item.text-danger i { color: #fca5a5; }
+    .dropdown-item.text-danger:hover { background: rgba(248,113,113,0.12) !important; }
+    .dropdown-divider { border-color: rgba(148,163,184,0.24) !important; margin: 0.35rem 0 !important; }
+    .dropdown-item-text { font-size: 0.78rem; color: rgba(148,163,184,0.9) !important; padding: 0.4rem 0.9rem !important; }
 
     /* user pill in nav */
     .user-pill {
         display: flex; align-items: center; gap: 0.65rem;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
         border-radius: 12px;
         padding: 0.45rem 1rem !important;
         font-size: 0.85rem; font-weight: 600;
@@ -232,8 +254,8 @@ $has_active_election = checkActiveElection($base_path);
         transition: all .2s;
     }
     .status-bar {
-        background: var(--dark-indigo);
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        background: rgba(9,12,20,0.98);
+        border-bottom: 1px solid rgba(99,102,241,0.18);
         padding: 0.85rem 0;
         color: white;
         font-size: 0.78rem;
@@ -241,15 +263,15 @@ $has_active_election = checkActiveElection($base_path);
         position: relative; z-index: 100;
         box-shadow: inset 0 -10px 15px -10px rgba(0,0,0,0.2);
     }
-    .status-left i { color: #818cf8; font-size: 1rem; }
-    .status-left strong { color: white; font-weight: 800; border-bottom: 1px dotted rgba(255,255,255,0.3); }
+    .status-left i { color: #a5b4fc; font-size: 1rem; }
+    .status-left strong { color: white; font-weight: 800; border-bottom: 1px dotted rgba(255,255,255,0.24); }
 
     /* live badge */
     .badge-live {
         display: inline-flex; align-items: center; gap: 0.4rem;
-        background: rgba(34,197,94,0.12);
-        border: 1px solid rgba(34,197,94,0.25);
-        color: #16a34a;
+        background: rgba(34,197,94,0.14);
+        border: 1px solid rgba(34,197,94,0.28);
+        color: #a7f3d0;
         border-radius: 99px; padding: 0.25rem 0.75rem;
         font-size: 0.75rem; font-weight: 700;
         letter-spacing: .02em;
@@ -263,17 +285,20 @@ $has_active_election = checkActiveElection($base_path);
 
     /* ── Alerts ── */
     .alert {
-        border: none !important; border-radius: var(--radius) !important;
+        border: 1px solid rgba(99,102,241,0.14) !important;
+        border-radius: var(--radius) !important;
         padding: 1rem 1.25rem !important;
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        background: rgba(9,12,22,0.96) !important;
+        color: var(--text-high) !important;
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.28);
     }
-    .alert-success { background: rgba(220,252,231,0.8) !important; color: #166534 !important; }
-    .alert-warning { background: rgba(254,249,195,0.8) !important; color: #854d0e !important; }
-    .alert-danger  { background: rgba(254,226,226,0.8) !important; color: #991b1b !important; }
-    .alert-info    { background: rgba(219,234,254,0.8) !important; color: #1e40af !important; }
-    .btn-close { filter: none !important; opacity: .5; }
+    .alert-success { background: rgba(20,83,45,0.55) !important; color: #a7f3d0 !important; }
+    .alert-warning { background: rgba(120,53,15,0.5) !important; color: #fcd34d !important; }
+    .alert-danger  { background: rgba(127,29,29,0.55) !important; color: #fecaca !important; }
+    .alert-info    { background: rgba(30,58,138,0.55) !important; color: #93c5fd !important; }
+    .btn-close { filter: none !important; opacity: .65; }
     .btn-close:hover { opacity: 1; }
 
     /* ── Main content wrapper ── */
@@ -310,13 +335,13 @@ $has_active_election = checkActiveElection($base_path);
         bottom: 0;
         left: 0;
         width: 100%;
-        background: rgba(255, 255, 255, 0.4);
+        background: rgba(9,12,20,0.96);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(99,102,241,0.15);
         z-index: 999;
         padding: 0.5rem 0;
-        box-shadow: 0 -8px 32px rgba(0,0,0,0.05);
+        box-shadow: 0 -12px 32px rgba(0,0,0,0.28);
     }
 
     .mobile-nav-container {
@@ -360,40 +385,40 @@ $has_active_election = checkActiveElection($base_path);
         .navbar-collapse { margin-bottom: 10px; }
     }
 
-    /* ── Student / Voter Global UI Kit (Soft Glass) ── */
-    .section-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.75rem; display: block; }
+    /* ── Student / Voter Global UI Kit (Dark Glass) ── */
+    .section-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 0.75rem; display: block; }
     
     .app-card {
-        background: rgba(255, 255, 255, 0.4);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
+        background: rgba(12,14,24,0.92);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border: 1px solid rgba(99,102,241,0.16);
         border-radius: 24px;
         padding: 1.25rem;
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.03);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.35);
         margin-bottom: 1.5rem;
+        color: #f8fafc;
     }
 
-    .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .tools-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
     .tool-tile {
-        background: rgba(255, 255, 255, 0.5);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: rgba(11,14,26,0.86);
+        border: 1px solid rgba(99,102,241,0.16);
         border-radius: 20px;
         padding: 1.25rem 1rem;
         text-align: center;
         text-decoration: none;
-        color: inherit;
+        color: #f8fafc;
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 0.5rem;
         transition: all 0.2s ease;
     }
-    .tool-tile:hover { transform: translateY(-4px); background: rgba(255, 255, 255, 0.7); border-color: #6366f1; }
-    .tool-tile i { font-size: 1.5rem; }
-    .tool-label { font-size: 0.85rem; font-weight: 800; color: #1e293b; }
-    .tool-sub { font-size: 0.65rem; color: #64748b; font-weight: 600; }
+    .tool-tile:hover { transform: translateY(-4px); background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.28); }
+    .tool-tile i { font-size: 1.5rem; color: #818cf8; }
+    .tool-label { font-size: 0.85rem; font-weight: 800; color: #f8fafc; }
+    .tool-sub { font-size: 0.65rem; color: #94a3b8; font-weight: 600; }
 
     .status-badge {
         display: inline-flex;
@@ -402,25 +427,25 @@ $has_active_election = checkActiveElection($base_path);
         border-radius: 99px;
         font-size: 0.7rem;
         font-weight: 800;
-        background: #fef3c7;
-        color: #92400e;
+        background: rgba(99,102,241,0.12);
+        color: #e2e8f0;
     }
-    .status-badge.success { background: #dcfce7; color: #166534; }
+    .status-badge.success { background: rgba(34,197,94,0.14); color: #a7f3d0; }
 
     /* Icons */
-    .icon-blue { color: #3b82f6; }
-    .icon-green { color: #10b981; }
-    .icon-gold { color: #f59e0b; }
-    .icon-purple { color: #8b5cf6; }
+    .icon-blue { color: #60a5fa; }
+    .icon-green { color: #34d399; }
+    .icon-gold { color: #facc15; }
+    .icon-purple { color: #a78bfa; }
 
-    /* Student Navbar (Soft Glass) */
+    /* Student Navbar (Dark Glass) */
     .navbar-student {
-        background: rgba(255, 255, 255, 0.3) !important;
+        background: rgba(9,12,22,0.92) !important;
         backdrop-filter: blur(30px) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(99,102,241,0.15);
     }
     .nav-link-student {
-        color: #475569 !important;
+        color: #cbd5e1 !important;
         font-weight: 700;
         font-size: 0.9rem;
         padding: 0.5rem 1rem !important;
@@ -428,8 +453,36 @@ $has_active_election = checkActiveElection($base_path);
         transition: all 0.2s;
     }
     .nav-link-student:hover, .nav-link-student.active {
-        background: rgba(99, 102, 241, 0.08);
-        color: #6366f1 !important;
+        background: rgba(99,102,241,0.14);
+        color: white !important;
+    }
+
+    /* Theme Toggle Pill Styling */
+    .theme-toggle-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        padding: 0.4rem 0.9rem;
+        border-radius: 99px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .theme-toggle-pill:hover {
+        background: rgba(255,255,255,0.2);
+    }
+    [data-theme="light"] .theme-toggle-pill {
+        background: rgba(99,102,241,0.1);
+        border: 1px solid rgba(99,102,241,0.3);
+        color: #4f46e5;
+    }
+    [data-theme="light"] .theme-toggle-pill:hover {
+        background: rgba(99,102,241,0.18);
+        color: #4338ca;
     }
     </style>
 
@@ -477,6 +530,14 @@ $has_active_election = checkActiveElection($base_path);
                     <li class="nav-item">
                         <a class="nav-link-admin-light <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>" href="<?php echo $base_path; ?>admin/dashboard.php">
                             <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-admin-light <?php echo basename($_SERVER['PHP_SELF']) == 'candidate_applications.php' ? 'active' : ''; ?>" href="<?php echo $base_path; ?>admin/candidate_applications.php">
+                            <i class="bi bi-envelope-paper"></i> Applications
+                            <?php if(isset($pending_apps_count) && $pending_apps_count > 0): ?>
+                                <span class="badge bg-danger rounded-pill ms-1" style="font-size: 0.65rem;"><?php echo $pending_apps_count; ?></span>
+                            <?php endif; ?>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -563,6 +624,7 @@ $has_active_election = checkActiveElection($base_path);
             'no_active_election'             => ['info',   'info-circle',         'There is no active election at the moment.'],
             'no_candidates'                  => ['warning','exclamation-triangle','This election has no candidates yet.'],
             'loggedout'                      => ['success','check-circle',        'You have been successfully logged out.'],
+            'election_paused'                => ['warning','pause-circle',        'This election has been temporarily paused by the administrator. Voting is suspended.'],
         ];
         [$alert_class, $icon, $message] = $map[$msg] ?? ['info','info-circle', htmlspecialchars($msg)];
         echo '<div class="alert alert-'.$alert_class.' alert-dismissible fade show d-flex align-items-center gap-2 shadow-sm" role="alert" style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05);">

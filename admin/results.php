@@ -314,6 +314,26 @@ include '../includes/header.php';
     color: #dee2e6;
     margin-bottom: 20px;
 }
+
+/* =========================================
+   DARK MODE OVERRIDES
+   ========================================= */
+[data-theme="dark"] .selector-panel { background: rgba(20,22,35,0.85); border-color: rgba(99,102,241,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+[data-theme="dark"] .selector-title { color: #e2e8f0; }
+[data-theme="dark"] .election-select { background: rgba(15,17,27,0.9); border-color: rgba(99,102,241,0.2); color: #e2e8f0; }
+[data-theme="dark"] .election-select option { background: #1a1c2e; color: #e2e8f0; }
+[data-theme="dark"] .stat-card { background: rgba(20,22,35,0.85); border-color: rgba(99,102,241,0.15); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+[data-theme="dark"] .stat-value { color: #e2e8f0; }
+[data-theme="dark"] .stat-label { color: #94a3b8; }
+[data-theme="dark"] .position-card { background: rgba(20,22,35,0.85); border-color: rgba(99,102,241,0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+[data-theme="dark"] .position-title { color: #e2e8f0; }
+[data-theme="dark"] .candidate-name { color: #e2e8f0; }
+[data-theme="dark"] .progress { background-color: rgba(255,255,255,0.05); }
+[data-theme="dark"] .export-bar { background: rgba(20,22,35,0.85); box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+[data-theme="dark"] .no-election { background: rgba(20,22,35,0.85); }
+[data-theme="dark"] .no-election h3 { color: #e2e8f0; }
+[data-theme="dark"] .no-election p { color: #94a3b8; }
+[data-theme="dark"] .no-election i { color: #334155; }
 </style>
 
 <div class="results-container">
@@ -391,7 +411,17 @@ include '../includes/header.php';
                                             <span class="winner-badge"><i class="bi bi-trophy-fill"></i> LEADING</span>
                                         <?php endif; ?>
                                     </div>
-                                    <div class="vote-count"><?php echo $candidate['vote_count']; ?></div>
+                                    <div style="display:flex;align-items:center;gap:10px;">
+                                        <div class="vote-count"><?php echo $candidate['vote_count']; ?></div>
+                                        <?php if($candidate['candidate_id']): ?>
+                                        <a href="candidate_voters.php?candidate_id=<?php echo $candidate['candidate_id']; ?>&election_id=<?php echo $selected_election; ?>" 
+                                           style="font-size:0.72rem;font-weight:700;color:#6366f1;text-decoration:none;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:99px;padding:2px 10px;white-space:nowrap;transition:all .2s;"
+                                           onmouseover="this.style.background='rgba(99,102,241,0.15)'"
+                                           onmouseout="this.style.background='rgba(99,102,241,0.08)'">
+                                            <i class="bi bi-people-fill"></i> View Voters
+                                        </a>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                                 <div class="progress">
                                     <div class="progress-bar <?php echo $is_winner ? 'bg-success' : 'bg-primary'; ?>" 

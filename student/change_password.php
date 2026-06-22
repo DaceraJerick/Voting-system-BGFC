@@ -54,14 +54,16 @@ include '../includes/header.php';
 .password-container {
     max-width: 600px;
     margin: 40px auto;
+    padding: 0 1rem;
 }
 
 .password-card {
-    background: white;
+    background: rgba(8,20,34,0.96);
     border-radius: 30px;
     padding: 40px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    border: 1px solid rgba(75,180,127,0.15);
+    color: #e7f5e5;
 }
 
 .password-header {
@@ -72,7 +74,7 @@ include '../includes/header.php';
 .password-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0f7f63, #22c55e);
     border-radius: 25px;
     display: flex;
     align-items: center;
@@ -84,7 +86,7 @@ include '../includes/header.php';
 
 .strength-meter {
     height: 6px;
-    background: #e2e8f0;
+    background: rgba(255,255,255,0.08);
     border-radius: 3px;
     margin-top: 10px;
     overflow: hidden;
@@ -94,6 +96,34 @@ include '../includes/header.php';
     height: 100%;
     width: 0;
     transition: width 0.3s, background 0.3s;
+}
+
+.form-control,
+.form-control-lg {
+    background: rgba(255,255,255,0.04);
+    color: #e8f9e8;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.form-control:focus,
+.form-control-lg:focus {
+    background: rgba(15,127,99,0.12);
+    border-color: #0f7f63;
+    box-shadow: 0 0 0 4px rgba(15,127,99,0.1);
+    color: #e8f9e8;
+}
+
+.text-muted {
+    color: #97bda9 !important;
+}
+
+.btn-outline-secondary {
+    color: #c7dcc9;
+    border-color: rgba(255,255,255,0.16);
+}
+
+.btn-outline-secondary:hover {
+    background: rgba(255,255,255,0.08);
 }
 </style>
 

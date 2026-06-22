@@ -111,11 +111,12 @@ include '../includes/header.php';
 
 <style>
 .vote-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0f7f63 0%, #1a9c72 100%);
     color: white;
     padding: 40px;
     border-radius: 20px;
     margin-bottom: 30px;
+    box-shadow: 0 18px 60px rgba(0,0,0,0.25);
 }
 
 .vote-stats {
@@ -126,22 +127,85 @@ include '../includes/header.php';
 }
 
 .stat-card {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 16px;
     text-align: center;
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
 .stat-number {
     font-size: 28px;
     font-weight: bold;
     margin-bottom: 5px;
+    color: #f4fffb;
 }
 
 .stat-label {
     font-size: 12px;
-    opacity: 0.9;
+    opacity: 0.8;
     text-transform: uppercase;
+    color: #d7efd6;
+}
+
+.card {
+    background: rgba(8,18,32,0.95) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    color: #e6f7e7;
+}
+
+.card-header {
+    background: rgba(15,127,99,0.12) !important;
+    color: #e6f7e7 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+.card-body {
+    color: #d7efda;
+}
+
+.vote-card {
+    background: rgba(10,20,34,0.96);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+}
+
+.vote-card .card-img-top {
+    border-top-left-radius: 22px;
+    border-top-right-radius: 22px;
+}
+
+.vote-card .card-body {
+    background: transparent;
+}
+
+.vote-card .form-check-label,
+.vote-card .card-title,
+.vote-card .card-text {
+    color: #d7f0d6;
+}
+
+.vote-card .form-check-input:checked {
+    background-color: #0f7f63;
+    border-color: #0f7f63;
+}
+
+.vote-card .form-check-input {
+    box-shadow: none;
+}
+
+.vote-card img,
+.vote-card .placeholder-box {
+    border-radius: 22px 22px 0 0;
+}
+
+.placeholder-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 250px;
+    background: rgba(255,255,255,0.05);
+    color: #a7c9a7;
 }
 </style>
 
@@ -167,7 +231,7 @@ include '../includes/header.php';
         
         <?php foreach($positions_grouped as $position_name => $position_data): ?>
         <div class="card mb-4">
-            <div class="card-header bg-primary">
+            <div class="card-header bg-success text-white">
                 <h5 class="mb-0"><?php echo htmlspecialchars($position_name); ?></h5>
             </div>
             <div class="card-body">
@@ -180,8 +244,8 @@ include '../includes/header.php';
                                  class="card-img-top" alt="<?php echo htmlspecialchars($candidate['candidate_name']); ?>" 
                                  style="height: 250px; object-fit: cover;">
                             <?php else: ?>
-                            <div style="height: 250px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
-                                <span style="color: #999;">No Photo</span>
+                            <div style="height: 250px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center;">
+                                <span style="color: #9bb7a3;">No Photo</span>
                             </div>
                             <?php endif; ?>
                             
@@ -208,7 +272,7 @@ include '../includes/header.php';
         <?php endforeach; ?>
         
         <div class="mt-5 mb-5">
-            <button type="submit" class="btn btn-primary btn-lg w-100">Submit Your Vote</button>
+            <button type="submit" class="btn btn-success btn-lg w-100">Submit Your Vote</button>
         </div>
     </form>
 </div>

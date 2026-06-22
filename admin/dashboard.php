@@ -25,22 +25,22 @@ include '../includes/header.php';
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap');
   
   :root {
-    --glass-bg: rgba(255, 255, 255, 0.6);
-    --glass-border: rgba(255, 255, 255, 0.8);
-    --text-main: #1e293b;
+    --glass-bg: rgba(255, 255, 255, 0.78);
+    --glass-border: rgba(15, 127, 99, 0.12);
+    --text-main: #0f172a;
     --text-muted: #64748b;
-    --accent: #6366f1;
+    --accent: #0f7f63;
   }
 
   body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     min-height: 100vh;
     background: 
-      radial-gradient(at 0% 0%, rgba(232, 232, 255, 0.5) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(245, 243, 255, 0.6) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(238, 242, 255, 0.5) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(240, 249, 255, 0.6) 0px, transparent 50%),
-      #f8fafc;
+      radial-gradient(at 0% 0%, rgba(15, 127, 99, 0.22) 0px, transparent 52%),
+      radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.18) 0px, transparent 45%),
+      radial-gradient(at 100% 100%, rgba(15, 127, 99, 0.10) 0px, transparent 45%),
+      radial-gradient(at 0% 100%, rgba(94, 234, 212, 0.09) 0px, transparent 40%),
+      #f4fbf7;
     background-attachment: fixed;
     color: var(--text-main);
   }
@@ -52,12 +52,12 @@ include '../includes/header.php';
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: 24px;
-    box-shadow: 0 4px 24px rgba(100, 116, 139, 0.04);
+    box-shadow: 0 18px 42px rgba(15, 127, 99, 0.08);
   }
 
   /* Welcome Banner */
   .welcome-banner {
-    padding: 40px 48px;
+    padding: 42px 48px;
     margin-bottom: 30px;
     position: relative;
     overflow: hidden;
@@ -68,7 +68,7 @@ include '../includes/header.php';
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: 8px;
-    background: linear-gradient(135deg, #1e293b, #6366f1);
+    background: linear-gradient(135deg, #0f172a, #0f7f63);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -187,8 +187,8 @@ include '../includes/header.php';
   .action-btn-new:hover .action-icon-small { background: #6366f1; color: white; }
 
   .action-info { display: flex; flex-direction: column; }
-  .action-name { font-weight: 700; font-size: 0.9rem; }
-  .action-detail { font-size: 0.75rem; color: #94a3b8; }
+  .action-name { font-weight: 700; font-size: 0.9rem; color: #1e293b !important; }
+  .action-detail { font-size: 0.75rem; color: #64748b !important; }
 
   /* System Overview */
   .overview-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.03); }
@@ -249,6 +249,30 @@ include '../includes/header.php';
   [data-theme="dark"] .overview-row { border-bottom-color: rgba(99,102,241,0.08) !important; }
   [data-theme="dark"] .overview-text { color: #94a3b8 !important; }
   [data-theme="dark"] .overview-num { color: #e2e8f0 !important; }
+
+  /* =========================================
+     LIGHT MODE OVERRIDES (Local Specificity)
+     ========================================= */
+  [data-theme="light"] body { background: #f0f4f8 !important; color: #1e293b !important; }
+  [data-theme="light"] .glass-card { background: rgba(255,255,255,0.95) !important; color: #1e293b !important; border-color: rgba(0,0,0,0.08) !important; }
+  [data-theme="light"] .stat-card-new { background: #ffffff !important; }
+  [data-theme="light"] .stat-number { color: #1e293b !important; }
+  [data-theme="light"] .stat-label { color: #475569 !important; }
+  [data-theme="light"] .banner-title {
+      background: linear-gradient(135deg, #0f172a, #0f7f63) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+  }
+  [data-theme="light"] .banner-subtitle { color: #475569 !important; }
+  [data-theme="light"] .system-status-pill { background: #ffffff !important; border-color: rgba(0,0,0,0.05) !important; color: #1e293b !important; }
+  [data-theme="light"] .panel-title { color: #1e293b !important; }
+  [data-theme="light"] .panel-badge { background: #f1f5f9 !important; color: #475569 !important; }
+  [data-theme="light"] .action-btn-new { background: #ffffff !important; border-color: rgba(0,0,0,0.08) !important; }
+  [data-theme="light"] .action-name { color: #1e293b !important; }
+  [data-theme="light"] .action-detail { color: #475569 !important; }
+  [data-theme="light"] .overview-row { border-bottom-color: rgba(0,0,0,0.05) !important; }
+  [data-theme="light"] .overview-text { color: #475569 !important; }
+  [data-theme="light"] .overview-num { color: #1e293b !important; }
 </style>
 
 <div class="container py-4">
@@ -337,6 +361,13 @@ include '../includes/header.php';
                             <span class="action-detail">Set up voting event</span>
                         </div>
                     </a>
+                    <a href="candidate_applications.php" class="action-btn-new">
+                        <div class="action-icon-small"><i class="bi bi-envelope-paper"></i></div>
+                        <div class="action-info">
+                            <span class="action-name">Review Applications</span>
+                            <span class="action-detail">Approve/Reject candidates</span>
+                        </div>
+                    </a>
                     <a href="results.php" class="action-btn-new">
                         <div class="action-icon-small"><i class="bi bi-bar-chart"></i></div>
                         <div class="action-info">
@@ -419,7 +450,7 @@ include '../includes/header.php';
 
                 <div class="panel-title mb-3" style="font-size: 0.9rem;">🗳️ Active Election</div>
                 <?php if($active_election): ?>
-                    <div style="background: rgba(99, 102, 241, 0.05); padding: 16px; border-radius: 16px; border: 1px dashed rgba(99, 102, 241, 0.2);">
+                    <div style="background: rgba(15, 127, 99, 0.06); padding: 16px; border-radius: 16px; border: 1px dashed rgba(15, 127, 99, 0.18);">
                         <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 4px;"><?php echo htmlspecialchars($active_election['title']); ?></div>
                         <div style="font-size: 0.75rem; color: #64748b;">Active until <?php echo date('M d, Y', strtotime($active_election['end_date'])); ?></div>
                         <a href="manage_elections.php" style="display: block; margin-top: 12px; font-size: 0.8rem; font-weight: 700; color: #6366f1; text-decoration: none;">Manage Event →</a>

@@ -13,6 +13,36 @@ if($_SESSION['user_type'] != 'admin') {
 $message = '';
 $error = '';
 
+// Handle add admin
+if(isset($_POST['add_admin'])) {
+    $username = trim($_POST['username']);
+    $full_name = trim($_POST['full_name']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    if(empty($username) || empty($password)) {
+        $error = "Username and Password are required!";
+    } elseif($password !== $confirm_password) {
+        $error = "Passwords do not match!";
+    } else {
+        // Check if username exists
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM admins WHERE username = ?");
+        $stmt->execute([$username]);
+        if($stmt->fetchColumn() > 0) {
+            $error = "Username already exists!";
+        } else {
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("INSERT INTO admins (username, password, full_name, email) VALUES (?, ?, ?, ?)");
+            if($stmt->execute([$username, $hashed_password, $full_name, $email])) {
+                $message = "Admin account created successfully!";
+            } else {
+                $error = "Failed to create admin account.";
+            }
+        }
+    }
+}
+
 // Handle delete admin
 if(isset($_GET['delete'])) {
     $admin_id = $_GET['delete'];
@@ -36,6 +66,47 @@ $admins = $pdo->query("SELECT id, username, full_name, email, created_at FROM ad
 include '../includes/header.php';
 ?>
 
+<style>
+/* =========================================
+   LIGHT MODE (default)
+   ========================================= */
+.card { background: #fff; border: 1px solid #e9ecef !important; }
+.card-header.bg-white { background: #fff !important; }
+.text-dark { color: #1e293b !important; }
+
+/* =========================================
+   DARK MODE OVERRIDES
+   ========================================= */
+[data-theme="dark"] h2 { color: #e2e8f0 !important; }
+[data-theme="dark"] .text-muted { color: #94a3b8 !important; }
+[data-theme="dark"] .card { background: rgba(20,22,35,0.85) !important; border-color: rgba(99,102,241,0.15) !important; box-shadow: 0 4px 24px rgba(0,0,0,0.25) !important; }
+[data-theme="dark"] .card-header.bg-white { background: rgba(15,17,27,0.9) !important; border-bottom-color: rgba(99,102,241,0.1) !important; }
+[data-theme="dark"] .card-header h5 { color: #e2e8f0 !important; }
+[data-theme="dark"] .table { color: #e2e8f0 !important; }
+[data-theme="dark"] .table thead.bg-light th { background: rgba(15,17,27,0.8) !important; color: #94a3b8 !important; border-color: rgba(99,102,241,0.1) !important; }
+[data-theme="dark"] .table tbody tr { border-color: rgba(99,102,241,0.08) !important; }
+[data-theme="dark"] .table tbody tr:hover td { background: rgba(99,102,241,0.04) !important; }
+[data-theme="dark"] .table td { border-color: rgba(99,102,241,0.08) !important; color: #e2e8f0 !important; }
+[data-theme="dark"] .text-dark { color: #e2e8f0 !important; }
+[data-theme="dark"] .text-body { color: #94a3b8 !important; }
+
+/* =========================================
+   LIGHT MODE OVERRIDES
+   ========================================= */
+[data-theme="light"] h2 { color: #1e293b !important; }
+[data-theme="light"] .text-muted { color: #64748b !important; }
+[data-theme="light"] .card { background: #ffffff !important; border-color: rgba(0,0,0,0.08) !important; box-shadow: 0 4px 20px rgba(0,0,0,0.06) !important; }
+[data-theme="light"] .card-header.bg-white { background: #f8fafc !important; border-bottom-color: rgba(0,0,0,0.08) !important; }
+[data-theme="light"] .card-header h5 { color: #1e293b !important; }
+[data-theme="light"] .table { color: #1e293b !important; }
+[data-theme="light"] .table thead.bg-light th { background: #f1f5f9 !important; color: #475569 !important; border-color: rgba(0,0,0,0.08) !important; }
+[data-theme="light"] .table tbody tr { border-color: rgba(0,0,0,0.05) !important; background: transparent !important; }
+[data-theme="light"] .table tbody tr:hover td { background: rgba(241,245,249,0.8) !important; }
+[data-theme="light"] .table td { border-color: rgba(0,0,0,0.05) !important; color: #1e293b !important; background: transparent !important; }
+[data-theme="light"] .text-dark { color: #0f172a !important; }
+[data-theme="light"] .text-body { color: #334155 !important; }
+</style>
+
 <div class="row mb-4">
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
@@ -44,9 +115,9 @@ include '../includes/header.php';
                 <p class="text-muted mb-0">View and manage administrator accounts.</p>
             </div>
             <div class="mt-2 mt-sm-0">
-                <a href="register.php" class="btn btn-primary shadow-sm">
+                <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addAdminModal">
                     <i class="bi bi-person-plus-fill"></i> Add New Admin
-                </a>
+                </button>
                 <a href="dashboard.php" class="btn btn-outline-secondary ms-2 shadow-sm">
                     <i class="bi bi-arrow-left"></i> Back to Dashboard
                 </a>
@@ -137,6 +208,46 @@ include '../includes/header.php';
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Admin Modal -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAdminModalLabel">Add New Administrator</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="add_admin" class="btn btn-primary">Add Admin</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
